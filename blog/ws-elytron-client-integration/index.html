@@ -144,7 +144,7 @@
 <p>Elytron client must be on classpath during <a href="https://docs.jboss.org/author/display/JBWS/Predefined+client+and+endpoint+configurations">assigning of configurations</a> for WS client in order for this integration to take place.</p>
 </div>
 <div class="paragraph">
-<p>WS client will automatically use <code>username</code>, <code>password</code> and <code>SSL context</code> configured in Elytron client. Credentials will be used for <code>HTTP BASIC authentication</code> or <code>Username Token Profile</code> authentication. Elytron client configuration was extended to include option that specifies which mechanism WS client should use with the credentials.</p>
+<p>WS client will automatically use <code>username</code>, <code>password</code> and <code>SSL context</code> configured in Elytron client. Credentials will be used for <code>HTTP BASIC authentication</code> or <code>Username Token Profile</code> authentication. Elytron client configuration was extended to include option that specifies which of these mechanisms should be used.</p>
 </div>
 <div class="paragraph">
 <p>Any existing configuration a client already had configured will not be re-written. Configuration specified by user in default WS client descriptor within the application (<code>jaxws-client-config.xml</code>) has precedence.</p>
@@ -155,7 +155,7 @@
 <h2 id="configure-elytron-client"><a class="anchor" href="#configure-elytron-client"></a>Configure Elytron client</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Elytron client allows for both use of an <code>Elytron API</code> and pre-defined configurations in the xml file (<code>wildfly-config.xml</code>) to enable remote clients to authenticate using Elytron. For more information please see <a href="https://docs.jboss.org/author/display/WFLY/Client+Authentication+with+Elytron+Client">Elytron client documentation</a>. SSL context configuration did not change and WS client will use it automatically. Below is an example of <code>wildfly-config.xml</code> that contains configuration of mechanisms that WS client should use with the credentials:</p>
+<p>Elytron client allows for both use of an <code>Elytron API</code> and pre-defined configurations in the xml file (<code>wildfly-config.xml</code>) to enable remote clients to authenticate using Elytron. For more information please see <a href="https://docs.jboss.org/author/display/WFLY/Client+Authentication+with+Elytron+Client">the documentation</a>. SSL context configuration did not change and WS client will use it automatically. Below is an example of <code>wildfly-config.xml</code> that contains configuration of mechanisms that WS client should use with the credentials:</p>
 </div>
 <div class="listingblock">
 <div class="content">
