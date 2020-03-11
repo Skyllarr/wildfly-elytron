@@ -155,7 +155,10 @@
 <h2 id="configure-elytron-client"><a class="anchor" href="#configure-elytron-client"></a>Configure Elytron client</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Elytron client allows for both use of an <code>Elytron API</code> and pre-defined configurations in the xml file (<code>wildfly-config.xml</code>) to enable remote clients to authenticate using Elytron. For more information please see <a href="https://docs.jboss.org/author/display/WFLY/Client+Authentication+with+Elytron+Client">the documentation</a>. SSL context configuration did not change and WS client will use it automatically. Below is an example of <code>wildfly-config.xml</code> that contains configuration of mechanisms that WS client should use with the credentials:</p>
+<p>Elytron client allows for both use of an <code>Elytron API</code> and pre-defined configurations in the xml file (<code>wildfly-config.xml</code>) to enable remote clients to authenticate using Elytron. For more information please see <a href="https://docs.jboss.org/author/display/WFLY/Client+Authentication+with+Elytron+Client">the documentation</a>. SSL context configuration did not change and WS client will use it automatically.</p>
+</div>
+<div class="paragraph">
+<p>Below is an example of <code>wildfly-config.xml</code> that contains configuration of mechanisms that WS client should use with Elytron client credentials:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -232,7 +235,7 @@ port.echo("Kermit");</code></pre>
 <h2 id="example"><a class="anchor" href="#example"></a>Example</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Working example demonstrating integration with Web Services client can be found <a href="https://github.com/Skyllarr/elytron-examples/tree/ws-integration-example/ws-client-integration">here</a>. In this example, two-way SSL is configured on the server. Additionally, HTTP BASIC authentication is required to connect to the server as well. Web Services client uses SSLContext and credentials from Elytron client to successfully connect to the server.</p>
+<p>Working example demonstrating this integration can be found <a href="https://github.com/Skyllarr/elytron-examples/tree/ws-integration-example/ws-client-integration">here</a>. In this example, two-way SSL is configured on the server. Additionally, HTTP BASIC authentication is required to connect to the server as well. Web Services client uses SSLContext and credentials from Elytron client to successfully connect to the server.</p>
 </div>
 </div>
 </div>
@@ -240,7 +243,7 @@ port.echo("Kermit");</code></pre>
 <h2 id="summary"><a class="anchor" href="#summary"></a>Summary</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This blog post has given an overview on how Web Services client can use Elytron client configuration when connecting to secured server. For more information see <a href="https://docs.jboss.org/author/display/WFLY/Client+Authentication+with+Elytron+Client">Elytron client documentation</a> and
+<p>This blog post has given an overview on how Web Services client can use Elytron client configuration when connecting to a secured server. For more information you can take a look at <a href="https://docs.jboss.org/author/display/WFLY/Client+Authentication+with+Elytron+Client">Elytron client documentation</a> and
 <a href="https://docs.jboss.org/author/display/WFLY10/Webservices+reference+guide">Web Services reference guide</a>.</p>
 </div>
 </div>
