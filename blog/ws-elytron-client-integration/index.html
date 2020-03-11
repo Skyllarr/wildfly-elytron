@@ -135,20 +135,19 @@
 </div>
       <div class="grid__item width-12-12">
           <div class="paragraph">
-<p>It is now possible for Web Services client to use authentication configuration from Elytron client to connect to a server. This blog post will give an introduction to this new feature.</p>
+<p>It is now possible for Web Services client to automatically load and use authentication configuration from Elytron client to connect to a server. This blog post will give an introduction to this new feature.</p>
 </div>
 <div class="sect1">
 <h2 id="scope-of-the-integration"><a class="anchor" href="#scope-of-the-integration"></a>Scope of the integration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Elytron client must be configured and on classpath during <a href="https://docs.jboss.org/author/display/JBWS/Predefined+client+and+endpoint+configurations">assigning of configurations</a> for WS client in order for this integration to take place.</p>
+<p>Elytron client must be on classpath during <a href="https://docs.jboss.org/author/display/JBWS/Predefined+client+and+endpoint+configurations">assigning of configurations</a> for WS client in order for this integration to take place.</p>
 </div>
 <div class="paragraph">
-<p>WS client will automatically use <code>username</code>, <code>password</code> and <code>SSL context</code> configured in Elytron client. Credentials will be used for <code>HTTP BASIC authentication</code> or <code>Username Token Profile</code> authentication - this can be set in the Elytron configuration itself.</p>
+<p>WS client will automatically use <code>username</code>, <code>password</code> and <code>SSL context</code> configured in Elytron client. Credentials will be used for <code>HTTP BASIC authentication</code> or <code>Username Token Profile</code> authentication. Elytron client configuration was extended to include option that specifies which mechanism WS client should use with the credentials.</p>
 </div>
 <div class="paragraph">
-<p>Any existing configuration the client already had configured will not be re-written. Configuration specified by user
-in default WS client descriptor within the application (jaxws-client-config.xml) has precedence.</p>
+<p>Any existing configuration the client already had configured will not be re-written. Configuration specified by user in default WS client descriptor within the application (<code>jaxws-client-config.xml</code>) has precedence.</p>
 </div>
 </div>
 </div>
@@ -157,7 +156,6 @@ in default WS client descriptor within the application (jaxws-client-config.xml)
 <div class="sectionbody">
 <div class="paragraph">
 <p>Elytron client allows for both use of an <code>Elytron API</code> and pre-defined configurations in the xml file (<code>wildfly-config.xml</code>) to enable remote clients to authenticate using Elytron.
-Elytron client configuration was extended with additional settings that specifies the mechanism (<code>BASIC</code> or <code>UsernameToken</code>) that webservices client will use if credentials are present.
 Below is the example of how Web Services client can be configured in <code>wildfly-config.xml</code> file:</p>
 </div>
 <div class="listingblock">
@@ -189,7 +187,7 @@ Below is the example of how Web Services client can be configured in <code>wildf
 </ul>
 </div>
 <div class="paragraph">
-<p>It is also possible to create webservices authentication configuration programmatically:</p>
+<p>It is also possible to configure the mechanism programmatically:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -201,18 +199,18 @@ Below is the example of how Web Services client can be configured in <code>wildf
 </div>
 </div>
 <div class="paragraph">
-<p>These elements will take effect only if both username and password are configured in Elytron client.</p>
+<p>These elements will take effect only if both username and password are configured in Elytron client. SSL context configuration did not change and WS client will use it automatically.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="web-services-client"><a class="anchor" href="#web-services-client"></a>Web Services client</h2>
+<h2 id="use-web-services-client"><a class="anchor" href="#use-web-services-client"></a>Use Web Services client</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>JBossWS API comes with facility classes that can be used for assigning configurations when building a client. For more information, you can take a look at the documentation <a href="https://github.com/wildfly/wildfly/blob/master/docs/src/main/asciidoc/_developer-guide/jax-ws/Predefined_client_and_endpoint_configurations.adoc#explicit-setup-through-API">here</a>.</p>
+<p>JBossWS API comes with facility classes that can be used for assigning of configurations when building a client. For more information, you can take a look at the documentation <a href="https://github.com/wildfly/wildfly/blob/master/docs/src/main/asciidoc/_developer-guide/jax-ws/Predefined_client_and_endpoint_configurations.adoc#explicit-setup-through-API">here</a>.</p>
 </div>
 <div class="paragraph">
-<p>For integration to work it is necessary to use <code>jbossws-cxf</code> client, specifically <code>CXFClientConfigurer</code> class and its method <code>setConfigProperties</code>. Whenever this method is called, both with or without other WS config files, Elytron client credentials and SSLContext will be used if present. Below are possible uses of this method:</p>
+<p>For integration to work it is necessary to use <code>jbossws-cxf</code> client, specifically <code>CXFClientConfigurer</code> class and its method <code>setConfigProperties</code>. Whenever this method is called, with or without other WS config files, Elytron client credentials and SSLContext will be used if present. Below are possible uses of this method:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -238,8 +236,8 @@ port.echo("Kermit");</code></pre>
 <h2 id="summary"><a class="anchor" href="#summary"></a>Summary</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This blog post has given an overview on how Web Services client can use Elytron client configuration when connecting to secured server. To see a working example, you can take a look <a href="https://github.com/Skyllarr/elytron-examples/tree/ws-integration-example/ws-client-integration">here</a>. For more information see <a href="https://github.com/wildfly/wildfly/blob/master/docs/src/main/asciidoc/_client-guide/Webservices_Client_Configuration.adoc">Elytron documentation</a> and
-<a href="https://github.com/wildfly/wildfly/blob/master/docs/src/main/asciidoc/_developer-guide/jax-ws/Predefined_client_and_endpoint_configurations.adoc#explicit-setup-through-API">Web Services documentation</a></p>
+<p>This blog post has given an overview on how Web Services client can use Elytron client configuration when connecting to secured server. To see a working example, you can take a look <a href="https://github.com/Skyllarr/elytron-examples/tree/ws-integration-example/ws-client-integration">here</a>. For more information see <a href="https://docs.jboss.org/author/display/WFLY/Client+Authentication+with+Elytron+Client">Elytron client documentation</a> and
+<a href="https://docs.jboss.org/author/display/WFLY10/Webservices+reference+guide">Web Services reference guide</a></p>
 </div>
 </div>
 </div>
