@@ -5,7 +5,7 @@
         <title>WildFly Elytron</title>
         <link>https://wildfly-security.github.io/wildfly-elytron</link>
         <description>WildFly Elytron: Security, Authentication, and Authorization SPIs for the WildFly project</description>
-        <lastBuildDate>Wed, 11 Mar 2020 17:33:12 +0000</lastBuildDate>
+        <lastBuildDate>Wed, 11 Mar 2020 18:03:57 +0000</lastBuildDate>
         
         <item>
             <title>Web Services client integration with Elytron</title>
@@ -13,7 +13,7 @@
                 https://wildfly-security.github.io/wildfly-elytron/blog/ws-elytron-client-integration/
             </link>
             <description>
-                It is now possible for Web Services client to automatically load and use authentication configuration from Elytron client to connect to a server. This blog post will give an introduction to this new feature. Scope of the integration Elytron client must be on classpath during assigning of configurations for WS...
+                It is now possible for Web Services client to automatically load and use authentication configuration from Elytron client to connect to a secured server. This blog post will give an introduction to this new feature. Scope of the integration Elytron client must be on classpath during assigning of configurations for...
             </description>
             <pubDate>Tue, 10 Mar 2020 00:00:00 +0000</pubDate>
             <guid>
