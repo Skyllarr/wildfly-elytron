@@ -30,7 +30,9 @@ import java.security.GeneralSecurityException;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.security.Provider;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -194,6 +196,21 @@ public final class AuthenticationContextConfigurationClient {
             }
         }
         return configuration;
+    }
+
+
+    List<SSLContext> getConfiguredSSLContexts(AuthenticationContext authenticationContext) {
+        List<SSLContext> sslContexts = new ArrayList<>();
+        RuleNode<SecurityFactory<SSLContext>> node = authenticationContext.getSslRules();
+        while (node != null) {
+            try {
+                sslContexts.add(node.getConfiguration().create());
+            } catch (GeneralSecurityException ignored) {
+                ignored.printStackTrace();
+            }
+            node = node.getNext();
+        }
+        return sslContexts;
     }
 
     /**

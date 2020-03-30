@@ -54,6 +54,10 @@
         </dependency>
         <dependency>
             <groupId>org.wildfly.security</groupId>
+            <artifactId>wildfly-elytron-dynamic-ssl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.security</groupId>
             <artifactId>wildfly-elytron-keystore</artifactId>
         </dependency>
         <dependency>
@@ -76,7 +80,7 @@
             <groupId>org.wildfly.security</groupId>
             <artifactId>wildfly-elytron-x500-cert</artifactId>
         </dependency>
-                                
+
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-annotations</artifactId>
@@ -146,6 +150,14 @@
             <artifactId>jmockit</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
-    
 </project>
