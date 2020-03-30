@@ -518,6 +518,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wildfly.security</groupId>
+                <artifactId>wildfly-elytron-dynamic-ssl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.security</groupId>
                 <artifactId>wildfly-elytron-http</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1285,6 +1290,7 @@
         <module>credential/source/deprecated</module>
         <module>credential/source/impl</module>
         <module>digest</module>
+        <module>dynamic-ssl</module>
         <module>http/base</module>
         <module>http/basic</module>
         <module>http/bearer</module>
