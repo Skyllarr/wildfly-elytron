@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<arquillian xmlns="http://jboss.org/schema/arquillian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+
+  <group qualifier="shared-tests" default="true">
+
+    <container qualifier="mutualSSL1" mode="manual">
+        <configuration>
+            <property name="jbossHome">/home/skylar/work/latestWFLY/SERVER/wildfly-19.0.0.Beta2</property>
+            <property name="javaVmArguments"> -Djboss.bind.address=127.0.0.1  </property>
+            <property name="managementPort">9990</property>
+            <property name="waitForPorts">8787 9990</property>
+            <property name="waitForPortsTimeoutInSeconds">8</property>
+            <property name="startupTimeoutInSeconds">60</property>
+        </configuration>
+    </container>
+
+    <container qualifier="mutualSSL2" mode="manual">
+        <configuration>
+            <property name="jbossHome">/home/skylar/work/latestWFLY/SERVER/wildfly-19.0.0.Beta2</property>
+            <property name="managementPort">12990</property>
+            <property name="javaVmArguments"> -Djboss.bind.address=127.0.0.1 -Djboss.socket.binding.port-offset=3000 </property>
+            <property name="waitForPorts">11787 12990</property>
+            <property name="waitForPortsTimeoutInSeconds">8</property>
+            <property name="startupTimeoutInSeconds">60</property>
+        </configuration>
+    </container>
+
+      <container qualifier="mutualSSL3" mode="manual">
+          <configuration>
+              <property name="jbossHome">/home/skylar/work/latestWFLY/SERVER/wildfly-19.0.0.Beta2</property>
+              <property name="managementPort">15990</property>
+              <property name="javaVmArguments"> -Djboss.bind.address=127.0.0.1 -Djboss.socket.binding.port-offset=6000 </property>
+              <property name="waitForPorts">14787 15990</property>
+              <property name="waitForPortsTimeoutInSeconds">8</property>
+              <property name="startupTimeoutInSeconds">60</property>
+          </configuration>
+      </container>
+  </group>
+</arquillian>
