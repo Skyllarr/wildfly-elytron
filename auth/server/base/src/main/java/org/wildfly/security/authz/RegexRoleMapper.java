@@ -41,6 +41,12 @@ public class RegexRoleMapper implements RoleMapper {
     private RegexRoleMapper(Builder builder) {
         checkNotNullParam("pattern", builder.pattern);
         checkNotNullParam("replacement", builder.replacement);
+        if (builder.pattern.length() < 1) {
+            throw log.invalidPatternInRegexRoleMapper();
+        }
+        if (builder.replacement.length() < 1) {
+            throw log.invalidReplacementInRegexRoleMapper();
+        }
         try {
             this.pattern = Pattern.compile(builder.pattern);
         } catch (PatternSyntaxException ex) {

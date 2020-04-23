@@ -190,6 +190,34 @@ public class RegexRoleMapperTest {
         mappedRoles.contains("application-user");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testRegexMapperInvalidReplacement2() {
+        new RegexRoleMapper.Builder().setPattern(".*-admin").setReplacement("").build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testRegexMapperInvalidPattern() {
+        new RegexRoleMapper.Builder().setPattern("").setReplacement("any").build();
+    }
+
+    @Test
+    public void testRegexMapperDoNotAlterRoles() {
+        Roles roles = createRoles("123-admin");
+        RegexRoleMapper roleMapper = new RegexRoleMapper.Builder().setPattern("(.*)").setReplacement("$1").setKeepNonMapped(false).setReplaceAll(true).build();
+        Roles mappedRoles = roleMapper.mapRoles(roles);
+        assertTrue(mappedRoles.contains("123-admin"));
+    }
+
+    @Test
+    public void testRegexMapperDoNotAlterRoles2() {
+        Roles roles = createRoles("123-admin");
+        RegexRoleMapper roleMapper = new RegexRoleMapper.Builder().setPattern("no-role-matches-this-pattern")
+                .setReplacement("any").setKeepNonMapped(true).setReplaceAll(true).build();
+        Roles mappedRoles = roleMapper.mapRoles(roles);
+        assertTrue(mappedRoles.contains("123-admin"));
+        assertFalse(mappedRoles.contains("any"));
+    }
+
     @Test
     public void testRegexMapperReplaceAllSubstrings() {
         Roles roles = createRoles("app-guest", "joe", "app-guest-first-time-guest");
