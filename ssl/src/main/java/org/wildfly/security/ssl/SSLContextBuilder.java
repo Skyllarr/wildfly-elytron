@@ -21,6 +21,7 @@ package org.wildfly.security.ssl;
 import static org.wildfly.security.provider.util.ProviderUtil.INSTALLED_PROVIDERS;
 
 import java.security.Provider;
+import java.security.SecureRandom;
 import java.security.Security;
 import java.util.function.Supplier;
 
@@ -32,6 +33,7 @@ import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.bouncycastle.crypto.CryptoServicesRegistrar;
 import org.wildfly.common.Assert;
 import org.wildfly.security.FixedSecurityFactory;
 import org.wildfly.security.OneTimeSecurityFactory;
@@ -339,11 +341,6 @@ public final class SSLContextBuilder {
             final SecurityFactory<SSLContext> sslContextFactory = SSLUtils.createSslContextFactory(protocolSelector, providerSupplier, providerName);
             // construct the original context
             final SSLContext sslContext = sslContextFactory.create();
-            SSLSessionContext sessionContext = clientMode ? sslContext.getClientSessionContext() : sslContext.getServerSessionContext();
-            if (sessionContext != null) {
-                if (sessionCacheSize >= 0) sessionContext.setSessionCacheSize(sessionCacheSize);
-                if (sessionTimeout >= 0) sessionContext.setSessionTimeout(sessionTimeout);
-            }
             final X509KeyManager x509KeyManager = keyManagerSecurityFactory == null ? null : keyManagerSecurityFactory.create();
             final X509TrustManager x509TrustManager = trustManagerSecurityFactory.create();
             final boolean canAuthPeers = securityDomain != null && securityDomain.getEvidenceVerifySupport(X509PeerCertificateChainEvidence.class).mayBeSupported();
@@ -369,7 +366,7 @@ public final class SSLContextBuilder {
                         x509KeyManager, providerSupplier, clientMode, authenticationOptional, sessionCacheSize,
                         sessionTimeout, wantClientAuth, needClientAuth, useCipherSuitesOrder, wrap);
             }
-
+            CryptoServicesRegistrar.setSecureRandom(new SecureRandom());
             sslContext.init(x509KeyManager == null ? null : new KeyManager[]{
                     x509KeyManager
             }, new TrustManager[]{
@@ -377,6 +374,11 @@ public final class SSLContextBuilder {
                             new SecurityDomainTrustManager(x509TrustManager, securityDomain, authenticationOptional, mechanismConfigurationSelector) :
                             x509TrustManager
             }, null);
+            SSLSessionContext sessionContext = clientMode ? sslContext.getClientSessionContext() : sslContext.getServerSessionContext();
+            if (sessionContext != null) {
+                if (sessionCacheSize >= 0) sessionContext.setSessionCacheSize(sessionCacheSize);
+                if (sessionTimeout >= 0) sessionContext.setSessionTimeout(sessionTimeout);
+            }
 
             // now, set up the wrapping configuration
             final SSLConfigurator sslConfigurator = clientMode ?
