@@ -5,7 +5,91 @@
         <title>WildFly Elytron</title>
         <link>https://wildfly-security.github.io/wildfly-elytron</link>
         <description>WildFly Elytron: Security, Authentication, and Authorization SPIs for the WildFly project</description>
-        <lastBuildDate>Mon, 16 Mar 2020 14:50:36 +0000</lastBuildDate>
+        <lastBuildDate>Tue, 16 Jun 2020 00:52:20 +0000</lastBuildDate>
+        
+        <item>
+            <title>Planned Security Features for WildFly</title>
+            <link>
+                https://wildfly-security.github.io/wildfly-elytron/blog/planned-security-features-for-wildfly-21/
+            </link>
+            <description>
+                Since the feature development phase for WildFly 21 has now started, we wanted to highlight the new security features that we will be working on. Planned Features Security Realm Enhancements WFCORE-4485 Support for multiple security realms - Distributed Identities This new feature will make it possible to use multiple security...
+            </description>
+            <pubDate>Thu, 11 Jun 2020 00:00:00 +0000</pubDate>
+            <guid>
+                https://wildfly-security.github.io/wildfly-elytron/blog/planned-security-features-for-wildfly-21/
+            </guid>
+        </item>
+        
+        <item>
+            <title>Advanced EJB: Securing EJBs using a FileSystem realm and invoking them from a remote client using a credential store</title>
+            <link>
+                https://wildfly-security.github.io/wildfly-elytron/blog/advanced-ejb-security/
+            </link>
+            <description>
+                The ejb-security quickstart demonstrates an advanced example on how to secure EJBs using a FileSystem realm with SCRAM-SHA-512 SASL authentication along with a client credential store. The focus is on the Elytron configuration, so if you wish to learn more about using Jakarta EE declarative security to control access to...
+            </description>
+            <pubDate>Thu, 11 Jun 2020 00:00:00 +0000</pubDate>
+            <guid>
+                https://wildfly-security.github.io/wildfly-elytron/blog/advanced-ejb-security/
+            </guid>
+        </item>
+        
+        <item>
+            <title>Using the IP Address of a Remote Client for Authorization Decisions</title>
+            <link>
+                https://wildfly-security.github.io/wildfly-elytron/blog/using-remote-client-ip-for-authorization/
+            </link>
+            <description>
+                WildFly 20 adds the ability to make use of the IP address of a remote client when making authorization decisions. This blog post will give an overview of this new feature. Authorization Decisions Roles and permissions can be assigned to a security identity based on attributes that are loaded from...
+            </description>
+            <pubDate>Mon, 08 Jun 2020 00:00:00 +0000</pubDate>
+            <guid>
+                https://wildfly-security.github.io/wildfly-elytron/blog/using-remote-client-ip-for-authorization/
+            </guid>
+        </item>
+        
+        <item>
+            <title>Automatic Credential Store Updates</title>
+            <link>
+                https://wildfly-security.github.io/wildfly-elytron/blog/automatic-credential-store-updates/
+            </link>
+            <description>
+                WildFly 20 adds support for automatic credential store updates. This blog post will give an overview of this new feature. Credential Stores Credential stores allow credentials to be stored securely. When adding a credential to a store, it is associated with an alias. This alias is then subsequently used to...
+            </description>
+            <pubDate>Mon, 08 Jun 2020 00:00:00 +0000</pubDate>
+            <guid>
+                https://wildfly-security.github.io/wildfly-elytron/blog/automatic-credential-store-updates/
+            </guid>
+        </item>
+        
+        <item>
+            <title>Elytron's ACME Client Implementation</title>
+            <link>
+                https://wildfly-security.github.io/wildfly-elytron/blog/elytron-acme-client-implementation/
+            </link>
+            <description>
+                The Automated Certificate Management Environment (ACME) protocol became an IETF standard a little over a year ago. This protocol makes it possible to automate the process of obtaining signed certificates from a certificate authority without the need for human intervention. The WildFly Elytron project provides a Java ACME client SPI...
+            </description>
+            <pubDate>Thu, 07 May 2020 00:00:00 +0000</pubDate>
+            <guid>
+                https://wildfly-security.github.io/wildfly-elytron/blog/elytron-acme-client-implementation/
+            </guid>
+        </item>
+        
+        <item>
+            <title>Server Side SNI Matching with WildFly</title>
+            <link>
+                https://wildfly-security.github.io/wildfly-elytron/blog/server-side-sni-matching-with-wildfly/
+            </link>
+            <description>
+                For quite some time now, WildFly has provided support for server side Server Name Indication (SNI) matching. This allows a WildFly instance with multiple virtual hosts that share a single IP address to present the correct certificate depending on the server name specified by the client via the SNI extension....
+            </description>
+            <pubDate>Wed, 22 Apr 2020 00:00:00 +0000</pubDate>
+            <guid>
+                https://wildfly-security.github.io/wildfly-elytron/blog/server-side-sni-matching-with-wildfly/
+            </guid>
+        </item>
         
         <item>
             <title>Web Services client integration with Elytron</title>
@@ -15,7 +99,7 @@
             <description>
                 It is now possible for Web Services client to automatically load and use authentication configuration from Elytron client to connect to a secured server. This blog post will give an introduction to this new feature. Scope of the integration Elytron client must be on classpath during assigning of configurations for...
             </description>
-            <pubDate>Tue, 10 Mar 2020 00:00:00 +0000</pubDate>
+            <pubDate>Wed, 18 Mar 2020 00:00:00 +0000</pubDate>
             <guid>
                 https://wildfly-security.github.io/wildfly-elytron/blog/ws-elytron-client-integration/
             </guid>
@@ -29,7 +113,7 @@
             <description>
                 It is now possible to use TLS 1.3 with WildFly when running against JDK 11 or higher. This blog post will give an introduction to this new feature. Disabled by Default The use of TLS 1.3 is currently disabled by default with WildFly. This is because if JDK 11 is...
             </description>
-            <pubDate>Mon, 09 Mar 2020 00:00:00 +0000</pubDate>
+            <pubDate>Wed, 18 Mar 2020 00:00:00 +0000</pubDate>
             <guid>
                 https://wildfly-security.github.io/wildfly-elytron/blog/tls-13-with-wildfly/
             </guid>
@@ -43,7 +127,7 @@
             <description>
                 This blog post highlights the new security features that have been included in WildFly 19. Support for MicroProfile JWT 1.1 Support has been added for the Eclipse MicroProfile JWT RBAC 1.1.1 specification with the addition of a new microprofile-jwt-smallrye subsystem. Traditionally, security for deployments would depend on resources defined within...
             </description>
-            <pubDate>Mon, 09 Mar 2020 00:00:00 +0000</pubDate>
+            <pubDate>Wed, 18 Mar 2020 00:00:00 +0000</pubDate>
             <guid>
                 https://wildfly-security.github.io/wildfly-elytron/blog/new-security-features-in-wildfly-19/
             </guid>
@@ -60,90 +144,6 @@
             <pubDate>Thu, 10 Oct 2019 00:00:00 +0000</pubDate>
             <guid>
                 https://developer.jboss.org/people/fjuma/blog/2019/10/10/planned-security-features-for-wildfly-19
-            </guid>
-        </item>
-        
-        <item>
-            <title>Configuring an aggregate-realm with a principal-transformer</title>
-            <link>
-                https://developer.jboss.org/people/aabdelsa/blog/2019/09/06/configuring-an-aggregate-realm-with-a-principal-transformer
-            </link>
-            <description>
-                
-            </description>
-            <pubDate>Fri, 06 Sep 2019 00:00:00 +0000</pubDate>
-            <guid>
-                https://developer.jboss.org/people/aabdelsa/blog/2019/09/06/configuring-an-aggregate-realm-with-a-principal-transformer
-            </guid>
-        </item>
-        
-        <item>
-            <title>Support for masked passwords in the client XML configuration</title>
-            <link>
-                https://developer.jboss.org/people/aabdelsa/blog/2019/09/05/support-for-masked-passwords-in-the-client-xml-configuration
-            </link>
-            <description>
-                
-            </description>
-            <pubDate>Thu, 05 Sep 2019 00:00:00 +0000</pubDate>
-            <guid>
-                https://developer.jboss.org/people/aabdelsa/blog/2019/09/05/support-for-masked-passwords-in-the-client-xml-configuration
-            </guid>
-        </item>
-        
-        <item>
-            <title>New Security Features in WildFly 18</title>
-            <link>
-                https://developer.jboss.org/people/fjuma/blog/2019/09/05/new-security-features-in-wildfly-18
-            </link>
-            <description>
-                
-            </description>
-            <pubDate>Thu, 05 Sep 2019 00:00:00 +0000</pubDate>
-            <guid>
-                https://developer.jboss.org/people/fjuma/blog/2019/09/05/new-security-features-in-wildfly-18
-            </guid>
-        </item>
-        
-        <item>
-            <title>Upcoming support for automatic updates of credential stores</title>
-            <link>
-                https://developer.jboss.org/people/fjuma/blog/2019/09/05/automatic-updates-of-credential-stores
-            </link>
-            <description>
-                
-            </description>
-            <pubDate>Thu, 05 Sep 2019 00:00:00 +0000</pubDate>
-            <guid>
-                https://developer.jboss.org/people/fjuma/blog/2019/09/05/automatic-updates-of-credential-stores
-            </guid>
-        </item>
-        
-        <item>
-            <title>Enhanced Audit Logging - Additional RFC Support and Reliability vs Speed Customization Update</title>
-            <link>
-                https://justinwildfly.blogspot.com/2019/08/enhanced-audit-logging-in-wildfly.html
-            </link>
-            <description>
-                
-            </description>
-            <pubDate>Fri, 30 Aug 2019 00:00:00 +0000</pubDate>
-            <guid>
-                https://justinwildfly.blogspot.com/2019/08/enhanced-audit-logging-in-wildfly.html
-            </guid>
-        </item>
-        
-        <item>
-            <title>WildFly Elytron Credential Store APIs</title>
-            <link>
-                https://darranl.blogspot.com/2019/06/wildfly-elytron-credential-store-apis.html
-            </link>
-            <description>
-                
-            </description>
-            <pubDate>Wed, 26 Jun 2019 00:00:00 +0000</pubDate>
-            <guid>
-                https://darranl.blogspot.com/2019/06/wildfly-elytron-credential-store-apis.html
             </guid>
         </item>
         
