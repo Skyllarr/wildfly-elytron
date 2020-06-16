@@ -135,23 +135,35 @@
 </div>
       <div class="grid__item width-12-12">
           <div class="paragraph">
-<p>Elytron subsystem configuration was enhanced to allow possibility to define a regex based security roles mapping mechanism. With this functionality it is possible to easily translate list of roles (eg. *-admin, *-user) to simpler roles (eg. admin, user) without having to implement custom components to achieve this.</p>
+<p>Elytron subsystem configuration was enhanced to allow possibility to define a regex based security roles mapping mechanism. With this functionality it is possible to easily translate list of roles, eg. <code>app-admin, abc-user</code>, to simpler roles , eg. <code>admin</code>, <code>user</code>.</p>
 </div>
 <div class="sect1">
 <h2 id="add-a-regex-role-mapper"><a class="anchor" href="#add-a-regex-role-mapper"></a>Add a regex role mapper</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>You can add a regex-role-mapper to the Elytron subsystem by specifying:
- * <code>pattern</code> that will be tested by a regex in order to identify which of the input roles are actually matching
- * <code>replacement</code> that the resulting security roles should be mapped to
- * <code>keep-non-mapped</code> that specifies whether to keep the roles that did not match the pattern or discard them from resulting roles
- * <code>replace-all</code> that specifies whether to replace all of the occurrences or only the first occurrence of the pattern in the resulting security role.</p>
+<p>You can add a <code>regex-role-mapper</code> to the Elytron subsystem by specifying:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>pattern</code> string that will be tested by a regex in order to identify which of the input roles are matching</p>
+</li>
+<li>
+<p><code>replacement</code> string that the resulting security roles should be mapped to</p>
+</li>
+<li>
+<p><code>keep-non-mapped</code> attribute that specifies whether to keep the roles that did not match the pattern or discard them from resulting roles</p>
+</li>
+<li>
+<p><code>replace-all</code> attribute that specifies whether to replace all of the occurrences or only the first occurrence of the pattern in the resulting security role.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>Both the pattern and replacement are in the form of STRING in the model. Default value of <code>keep-non-mapped</code> is true and of <code>replace-all</code> is false.</p>
+<p>Default value of <code>keep-non-mapped</code> is true and of <code>replace-all</code> is false.</p>
 </div>
 <div class="paragraph">
-<p>In the example below the domain part is extracted from input roles that are in form of an email address in order to convert them to the {extracted_domain}-role format. E.g.: <a href="mailto:user@gmail.com">user@gmail.com</a> and <a href="mailto:user@customApp.com">user@customApp.com</a> input roles would result in gmail-role and customerApp-role security roles. keep-non-mapped="true" will allow to keep the roles that do not match the regex (those that were not in form of an email).</p>
+<p>Regex role mapper in the example below will extract the domain part from input roles that are in form of an email address in order to convert them to the {extracted_domain}-role format. E.g.: <a href="mailto:user@gmail.com">user@gmail.com</a> and <a href="mailto:user@customApp.com">user@customApp.com</a> input roles would result in gmail-role and customerApp-role security roles. Attribute keep-non-mapped="true" is used to keep the roles that do not match the regex (those that were not in form of an email).</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -168,27 +180,22 @@
 <h2 id="example"><a class="anchor" href="#example"></a>Example</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Connect to the WildFly CLI and add security domain to the Elytron subsystem with identities that contain roles 123-user, 123-admin:</p>
+<p>Connect to the WildFly CLI and add security domain to the Elytron subsystem with identity that contains roles 123-user, 123-admin.
+Also add regex-role-mapper and apply it to this security domain. This regex-role-mapper will map roles that match .<strong>-([a-z]</strong>) to the role $1:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">/subsystem=elytron/filesystem-realm=myFsRealm:add(path=my-fs-realm-users,relative-to=jboss.server.config.dir)</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Add regex-role-mapper and apply it to the security domain. This regex-role-mapper will map roles that match .<strong>-([a-z]</strong>) to the role $1:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">/subsystem=elytron/filesystem-realm=myFsRealm:add-identity(identity=joe)
+<pre class="highlightjs highlight"><code class="language-none hljs">/subsystem=elytron/filesystem-realm=myFsRealm:add(path=my-fs-realm-users,relative-to=jboss.server.config.dir)
+
+/subsystem=elytron/filesystem-realm=myFsRealm:add-identity(identity=joe)
 
 /subsystem=elytron/filesystem-realm=myFsRealm:add-identity-attribute(identity=joe, name=Roles, value=["123-user","123-admin"])
 
-/subsystem=elytron/regex-role-mapper=rrm:add(pattern=".*-([a-z]*)", replacement="$1", keep-non-mapped="false", replace-all="false")
-
 /subsystem=elytron/simple-role-decoder=from-roles-attribute:add(attribute=Roles)
 
-/subsystem=elytron/security-domain=mySD:add(realms=[{realm=myFsRealm,role-decoder=from-roles-attribute}],default-realm=myFsRealm,permission-mapper=default-permission-mapper)</code></pre>
+/subsystem=elytron/regex-role-mapper=rrm:add(pattern=".*-([a-z]*)", replacement="$1", keep-non-mapped="false", replace-all="false")
+
+/subsystem=elytron/security-domain=mySD:add(realms=[{realm=myFsRealm,role-decoder=from-roles-attribute}],role-mapper=rrm,default-realm=myFsRealm,permission-mapper=default-permission-mapper)</code></pre>
 </div>
 </div>
 <div class="paragraph">

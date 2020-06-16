@@ -5,7 +5,7 @@
         <title>WildFly Elytron</title>
         <link>https://wildfly-security.github.io/wildfly-elytron</link>
         <description>WildFly Elytron: Security, Authentication, and Authorization SPIs for the WildFly project</description>
-        <lastBuildDate>Tue, 16 Jun 2020 01:26:10 +0000</lastBuildDate>
+        <lastBuildDate>Tue, 16 Jun 2020 07:14:37 +0000</lastBuildDate>
         
         <item>
             <title>Using regex role mapper in Elytron</title>
@@ -13,7 +13,7 @@
                 https://wildfly-security.github.io/wildfly-elytron/blog/regex-role-mapper/
             </link>
             <description>
-                Elytron subsystem configuration was enhanced to allow possibility to define a regex based security roles mapping mechanism. With this functionality it is possible to easily translate list of roles (eg. *-admin, *-user) to simpler roles (eg. admin, user) without having to implement custom components to achieve this. Add a regex...
+                Elytron subsystem configuration was enhanced to allow possibility to define a regex based security roles mapping mechanism. With this functionality it is possible to easily translate list of roles, eg. app-admin, abc-user, to simpler roles , eg. admin, user. Add a regex role mapper You can add a regex-role-mapper to...
             </description>
             <pubDate>Tue, 16 Jun 2020 00:00:00 +0000</pubDate>
             <guid>
