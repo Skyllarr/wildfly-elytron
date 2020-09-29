@@ -141,7 +141,7 @@
 <h2 id="elytron-client-configuration"><a class="anchor" href="#elytron-client-configuration"></a>Elytron client configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>No new elements have been added to the Elytron client configuration, because all of the mentioned mechanisms are already configurable. Credentials will be used for HTTP Basic authentication by default. For more information about how to configure Elytron client you can look at the <a href="https://docs.wildfly.org/20/Client_Guide.html">documentation</a>.</p>
+<p>No new elements have been added to the Elytron client configuration as all of the mentioned mechanisms were already configurable. Credentials will be used for HTTP Basic authentication by default. For more information about how to configure Elytron client you can look at the <a href="https://docs.wildfly.org/20/Client_Guide.html">documentation</a>.</p>
 </div>
 </div>
 </div>
@@ -149,19 +149,7 @@
 <h2 id="use-resteasy-client"><a class="anchor" href="#use-resteasy-client"></a>Use RESTEasy client</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Make sure you have the following dependency on your classpath:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code data-lang="xml" class="language-xml hljs">&lt;dependency&gt;
-    &lt;groupId&gt;org.wildfly&lt;/groupId&gt;
-    &lt;artifactId&gt;wildfly-client-all&lt;/artifactId&gt;
-    &lt;version&gt;21.0.0.Final&lt;/version&gt;
-&lt;/dependency&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The integration will take place when configured Elytron client is on classpath during build of the RESTEasy client:</p>
+<p>The integration will take place if Elytron client is on classpath during build of the RESTEasy client:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -174,17 +162,27 @@ ResteasyClient client = new ResteasyClientBuilder().build();</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p><strong>Note:</strong> You can have Elytron client configured either in <strong>wildfly-config.xml</strong> file or <strong>in code</strong>, eg.:</p>
+<p>So make sure you have the following dependency on your classpath:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">AuthenticationConfiguration context = AuthenticationConfiguration.empty()
-    .useName("name")
-    .usePassword("pass");
+<pre class="highlightjs highlight"><code data-lang="xml" class="language-xml hljs">&lt;dependency&gt;
+    &lt;groupId&gt;org.wildfly&lt;/groupId&gt;
+    &lt;artifactId&gt;wildfly-client-all&lt;/artifactId&gt;
+    &lt;version&gt;21.0.0.Final&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Note:</strong> You can have Elytron client configured either in <strong>wildfly-config.xml</strong> file or <strong>in code</strong> like below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">AuthenticationConfiguration context = AuthenticationConfiguration.empty().useName("name").usePassword("pass");
 AuthenticationContext.empty().with(MatchRule.ALL, context).run(() -&gt; {
-            ResteasyClient client = new ResteasyClientBuilder().build();
-            ...
-    });</code></pre>
+    ResteasyClient client = new ResteasyClientBuilder().build();
+    ...
+});</code></pre>
 </div>
 </div>
 </div>
