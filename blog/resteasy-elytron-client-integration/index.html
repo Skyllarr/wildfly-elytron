@@ -144,7 +144,7 @@
 <h2 id="elytron-client-configuration"><a class="anchor" href="#elytron-client-configuration"></a>Elytron client configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>No new elements have been added to the Elytron client configuration as all of the mentioned mechanisms were already configurable. <strong>Configured credentials will be used for HTTP Basic authentication by default.</strong> For more information on how to configure Elytron client take a look at the <a href="https://docs.wildfly.org/20/Client_Guide.html">documentation</a>.</p>
+<p>No new elements have been added to the Elytron client configuration as all of the mentioned mechanisms were already configurable. <code>Configured credentials will be used for HTTP Basic authentication by default.</code> For more information on how to configure Elytron client take a look at the <a href="https://docs.wildfly.org/20/Client_Guide.html">documentation</a>.</p>
 </div>
 <div class="paragraph">
 <p>Please note that any configuration that RESTEasy client already had configured will not be rewritten.</p>
@@ -172,10 +172,7 @@ ResteasyClient client = new ResteasyClientBuilder().build();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">import javax.ws.rs.client.ClientBuilder;
-...
-
-(ResteasyClient) ClientBuilder.newBuilder().build();</code></pre>
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">ResteasyClient client = (ResteasyClient) ClientBuilder.newBuilder().build();</code></pre>
 </div>
 </div>
 <div class="paragraph">
