@@ -1,0 +1,52 @@
+---
+layout: post
+title: 'RESTEasy client integration with WildFly Elytron client'
+date: 2020-09-29
+tags: elytron wildfly21 resteasy client bearer token basic authentication ssl tls context spi
+synopsis: An overview of the new RESTEasy client integration with WildFly Elytron client
+author: dvilkola
+---
+
+We added a functionality to the RESTEasy client that allows to place your own authentication configuration via SPI (service provider interface) implementation. More specifically, it is now possible to provide Bearer token, SSL context and credentials for HTTP BASIC authentication that the RESTEasy client will make use of. WildFly Elytron client implements this interface, which allows for RESTEasy client to load its configuration if the artifact `wildfly-client-all` is on classpath.
+
+== Elytron client configuration
+
+No new elements have been added to the Elytron client configuration, because all of the mentioned mechanisms are already configurable. Credentials will be used for HTTP Basic authentication by default. For more information about how to configure Elytron client you can look at the https://docs.wildfly.org/20/Client_Guide.html[documentation].
+
+== Use RESTEasy client
+
+The integration will take place when configured Elytron client is on classpath during build of the RESTEasy client:
+
+[source,java]
+----
+import javax.ws.rs.client.ClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+
+...
+
+ResteasyClient client = new ResteasyClientBuilder().build();
+----
+
+Make sure you have the following dependency on your classpath:
+
+[source,xml]
+----
+<dependency>
+    <groupId>org.wildfly</groupId>
+    <artifactId>wildfly-client-all</artifactId>
+    <version>21.0.0.Final</version>
+</dependency>
+----
+
+== Example
+
+Working example demonstrating this integration can be found https://github.com/wildfly-security-incubator/elytron-examples/tree/master/resteasy-client-integration[here]. In this example, two-way SSL is configured on the server. Additionally, HTTP BASIC authentication is required to connect to the server as well. RESTEasy client uses SSLContext and credentials from Elytron client to successfully connect to the server.
+
+
+== Supply your own security configuration to RESTEasy client
+
+You can provide your own implementation of the https://github.com/resteasy/Resteasy/blob/master/resteasy-client/src/main/java/org/jboss/resteasy/client/jaxrs/spi/ClientConfigProvider.java[org.jboss.resteasy.client.jaxrs.spi.ClientConfigProvider] interface and supply authentication configuration from some other source.
+
+== Summary
+
+This blog post has given an overview of RESTEasy client integration with WildFly Elytron client.
