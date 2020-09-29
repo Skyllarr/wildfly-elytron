@@ -135,13 +135,19 @@
 </div>
       <div class="grid__item width-12-12">
           <div class="paragraph">
-<p>We added a functionality to the RESTEasy client that allows to place your own authentication configuration via SPI (service provider interface) implementation. More specifically, it is now possible to provide Bearer token, SSL context and credentials for HTTP BASIC authentication that the RESTEasy client will make use of. WildFly Elytron client implements this interface, which allows for RESTEasy client to load its configuration if the artifact <code>wildfly-client-all</code> is on classpath.</p>
+<p>We have added a new functionality to the RESTEasy client that allows it to use authentication configuration from WildFly Elytron client.</p>
+</div>
+<div class="paragraph">
+<p>It is now possible to configure <strong>Bearer token</strong>, <strong>SSL context</strong> and <strong>credentials</strong> in Elytron client that RESTEasy client will automatically use when making requests.</p>
 </div>
 <div class="sect1">
 <h2 id="elytron-client-configuration"><a class="anchor" href="#elytron-client-configuration"></a>Elytron client configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>No new elements have been added to the Elytron client configuration as all of the mentioned mechanisms were already configurable. Credentials will be used for HTTP Basic authentication by default. For more information about how to configure Elytron client you can look at the <a href="https://docs.wildfly.org/20/Client_Guide.html">documentation</a>.</p>
+<p>No new elements have been added to the Elytron client configuration as all of the mentioned mechanisms were already configurable. <strong>Configured credentials will be used for HTTP Basic authentication by default</strong>. For more information about how to configure Elytron client you can look at the <a href="https://docs.wildfly.org/20/Client_Guide.html">documentation</a>.</p>
+</div>
+<div class="paragraph">
+<p>Please note that any configuration that RESTEasy client had already configured will not be rewritten.</p>
 </div>
 </div>
 </div>
@@ -149,7 +155,7 @@
 <h2 id="resteasy-client-use"><a class="anchor" href="#resteasy-client-use"></a>RESTEasy client use</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The integration will take place if Elytron client is on classpath during build of the RESTEasy client:</p>
+<p>It is necessary to have Elytron client on classpath during build of the RESTEasy client:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -199,7 +205,7 @@ AuthenticationContext.empty().with(MatchRule.ALL, context).run(() -&gt; {
 <h2 id="supply-your-own-security-configuration-to-resteasy-client"><a class="anchor" href="#supply-your-own-security-configuration-to-resteasy-client"></a>Supply your own security configuration to RESTEasy client</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>You can provide your own implementation of the <a href="https://github.com/resteasy/Resteasy/blob/master/resteasy-client/src/main/java/org/jboss/resteasy/client/jaxrs/spi/ClientConfigProvider.java">org.jboss.resteasy.client.jaxrs.spi.ClientConfigProvider</a> interface and supply authentication configuration from other source as well.</p>
+<p>You can also provide your own implementation of the <a href="https://github.com/resteasy/Resteasy/blob/master/resteasy-client/src/main/java/org/jboss/resteasy/client/jaxrs/spi/ClientConfigProvider.java">org.jboss.resteasy.client.jaxrs.spi.ClientConfigProvider</a> interface and supply authentication configuration from other source than Elytron client.</p>
 </div>
 </div>
 </div>

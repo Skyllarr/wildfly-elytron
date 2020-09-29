@@ -5,7 +5,7 @@
         <title>WildFly Elytron</title>
         <link>https://wildfly-security.github.io/wildfly-elytron</link>
         <description>WildFly Elytron: Security, Authentication, and Authorization SPIs for the WildFly project</description>
-        <lastBuildDate>Tue, 29 Sep 2020 11:25:29 +0000</lastBuildDate>
+        <lastBuildDate>Tue, 29 Sep 2020 11:53:51 +0000</lastBuildDate>
         
         <item>
             <title>RESTEasy client integration with WildFly Elytron client</title>
@@ -13,7 +13,7 @@
                 https://wildfly-security.github.io/wildfly-elytron/blog/resteasy-elytron-client-integration/
             </link>
             <description>
-                We added a functionality to the RESTEasy client that allows to place your own authentication configuration via SPI (service provider interface) implementation. More specifically, it is now possible to provide Bearer token, SSL context and credentials for HTTP BASIC authentication that the RESTEasy client will make use of. WildFly Elytron...
+                We have added a new functionality to the RESTEasy client that allows it to use authentication configuration from WildFly Elytron client. It is now possible to configure Bearer token, SSL context and credentials in Elytron client that RESTEasy client will automatically use when making requests. Elytron client configuration No new...
             </description>
             <pubDate>Tue, 29 Sep 2020 00:00:00 +0000</pubDate>
             <guid>
