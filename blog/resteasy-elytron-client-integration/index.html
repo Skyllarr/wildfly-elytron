@@ -138,16 +138,16 @@
 <p>We have added a new functionality to the RESTEasy client that allows it to use authentication configuration from WildFly Elytron client.</p>
 </div>
 <div class="paragraph">
-<p>It is now possible to configure <strong>Bearer token</strong>, <strong>SSL context</strong> and <strong>credentials</strong> in Elytron client that RESTEasy client will automatically use when making requests.</p>
+<p>It is now possible to configure <strong>bearer token</strong>, <strong>SSL context</strong> and <strong>credentials</strong> in Elytron client that RESTEasy client will automatically use when making requests.</p>
 </div>
 <div class="sect1">
 <h2 id="elytron-client-configuration"><a class="anchor" href="#elytron-client-configuration"></a>Elytron client configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>No new elements have been added to the Elytron client configuration as all of the mentioned mechanisms were already configurable. <strong>Configured credentials will be used for HTTP Basic authentication by default</strong>. For more information about how to configure Elytron client you can look at the <a href="https://docs.wildfly.org/20/Client_Guide.html">documentation</a>.</p>
+<p>No new elements have been added to the Elytron client configuration as all of the mentioned mechanisms were already configurable. <strong>Configured credentials will be used for HTTP Basic authentication by default.</strong> For more information on how to configure Elytron client take a look at the <a href="https://docs.wildfly.org/20/Client_Guide.html">documentation</a>.</p>
 </div>
 <div class="paragraph">
-<p>Please note that any configuration that RESTEasy client had already configured will not be rewritten.</p>
+<p>Please note that any configuration that RESTEasy client already had configured will not be rewritten.</p>
 </div>
 </div>
 </div>
@@ -155,7 +155,7 @@
 <h2 id="resteasy-client-use"><a class="anchor" href="#resteasy-client-use"></a>RESTEasy client use</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>It is necessary to have Elytron client on classpath during build of the RESTEasy client:</p>
+<p>It is necessary to have WildFly Elytron client on classpath <strong>when the build method of RESTEasy client</strong> is called:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -168,7 +168,18 @@ ResteasyClient client = new ResteasyClientBuilder().build();</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>So make sure you have the following dependency on your classpath:</p>
+<p>or:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="java" class="language-java hljs">import javax.ws.rs.client.ClientBuilder;
+...
+
+(ResteasyClient) ClientBuilder.newBuilder().build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Make sure you have the following dependency on your classpath:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -197,7 +208,7 @@ AuthenticationContext.empty().with(MatchRule.ALL, context).run(() -&gt; {
 <h2 id="example"><a class="anchor" href="#example"></a>Example</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Working example demonstrating this integration can be found <a href="https://github.com/wildfly-security-incubator/elytron-examples/tree/master/resteasy-client-integration">here</a>. In this example, two-way SSL is configured on the server. Additionally, HTTP BASIC authentication is required to connect to the server as well. RESTEasy client uses SSLContext and credentials from Elytron client to successfully connect to the server.</p>
+<p>An example demonstrating this integration can be found <a href="https://github.com/wildfly-security-incubator/elytron-examples/tree/master/resteasy-client-integration">here</a>. In this example, two-way SSL is configured on the server. Additionally, HTTP BASIC authentication is required to connect to the server as well. RESTEasy client uses SSLContext and credentials from Elytron client to successfully connect to the server.</p>
 </div>
 </div>
 </div>
