@@ -261,6 +261,10 @@ public final class ElytronXmlParser {
                         case "authentication-client": {
                             return parseAuthenticationClientType(reader, xmlVersion);
                         }
+//                        case "default-ssl-context-for-jvm": {
+//                            sslContextForProviderName = parseNameType(reader);
+//                            break;
+//                        }
                         default: {
                             throw reader.unexpectedElement();
                         }
@@ -314,6 +318,8 @@ public final class ElytronXmlParser {
         Map<String, ExceptionSupplier<CredentialStore, ConfigXMLParseException>> credentialStoresMap = new HashMap<>();
         Map<String, ExceptionSupplier<SecurityFactory<SSLContext>, ConfigXMLParseException>> sslContextsMap = new HashMap<>();
         Map<String, ExceptionSupplier<AuthenticationConfiguration, ConfigXMLParseException>> authenticationConfigurationsMap = new HashMap<>();
+        String sslContextForProviderName = null;
+        ExceptionSupplier<SecurityFactory<SSLContext>, ConfigXMLParseException> sslContextForProvider = () -> null;
         final DeferredSupplier<Provider[]> providersSupplier = new DeferredSupplier<>(DEFAULT_PROVIDER_SUPPLIER);
         boolean netAuthenticator = false;
         int foundBits  = 0;
@@ -374,6 +380,10 @@ public final class ElytronXmlParser {
                         }
                         break;
                     }
+                    case "default-ssl-context-for-jvm": {
+                        sslContextForProviderName = parseNameType(reader);
+                        break;
+                    }
                     default: throw reader.unexpectedElement();
                 }
             } else if (tag == END_ELEMENT) {
@@ -388,8 +398,29 @@ public final class ElytronXmlParser {
                 for (ExceptionSupplier<CredentialStore, ConfigXMLParseException> supplier : credentialStoresMap.values()) {
                     supplier.get();
                 }
+                // validate ssl context for provider
+                if (sslContextForProviderName != null) {
+                    ExceptionSupplier<SecurityFactory<SSLContext>, ConfigXMLParseException> sslContext = sslContextsMap.get(sslContextForProviderName);
+                    if (sslContext == null) {
+                        throw new ConfigXMLParseException(xmlLog.specifiedSSLContextForSecurityProviderDoesNotExist());
+                    } else {
+                        sslContextForProvider = sslContext;
+                    }
+                }
+
                 final RuleNode<AuthenticationConfiguration> authNode = authFactory.get();
                 final RuleNode<SecurityFactory<SSLContext>> sslNode = sslFactory.get();
+//                authNode.with()
+                try {
+                    if (sslContextForProvider.get() != null) {
+//                        AuthenticationConfiguration finalConfiguration = authNode.getConfiguration().useSSLContextForProvider(sslContextForProvider.get().create());
+                        AuthenticationConfiguration finalConfiguration = AuthenticationConfiguration.empty().useSSLContextForProvider(sslContextForProvider.get().create());
+//                        return () -> new AuthenticationContext(authNode.geauthNode.getConfiguration().sslContextForProvider, sslNode).with(MatchRule.ALL, finalConfiguration);
+                        return () -> new AuthenticationContext(authNode, sslNode).with( MatchRule.ALL, finalConfiguration);
+                    }
+                } catch (GeneralSecurityException e) {
+                    e.printStackTrace();
+                }
                 return () -> new AuthenticationContext(authNode, sslNode);
             } else {
                 throw reader.unexpectedContent();

@@ -44,6 +44,7 @@
             <xsd:element name="ssl-context-rules" type="ssl-context-rules-type" minOccurs="0"/>
             <xsd:element name="ssl-contexts" type="ssl-contexts-type" minOccurs="0"/>
             <xsd:element name="providers" type="providers-type" minOccurs="0"/>
+            <xsd:element name="default-ssl-context-for-jvm" type="name-type" minOccurs="0"/>
         </xsd:all>
     </xsd:complexType>
 

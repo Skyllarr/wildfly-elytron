@@ -201,4 +201,7 @@ public interface ElytronMessages extends BasicLogger {
 
     @Message(id = 14004, value = "Password callback handling was unsuccessful")
     ConfigXMLParseException passwordCallbackHandlingWasUnsuccessful();
+
+    @Message(id = 14005, value = "Specified SSL context for security provider does not exist")
+    ConfigXMLParseException specifiedSSLContextForSecurityProviderDoesNotExist();
 }
