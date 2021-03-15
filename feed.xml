@@ -5,7 +5,35 @@
         <title>WildFly Elytron</title>
         <link>https://wildfly-security.github.io/wildfly-elytron</link>
         <description>WildFly Elytron: Security, Authentication, and Authorization SPIs for the WildFly project</description>
-        <lastBuildDate>Fri, 12 Mar 2021 12:16:35 +0000</lastBuildDate>
+        <lastBuildDate>Mon, 15 Mar 2021 15:40:49 +0000</lastBuildDate>
+        
+        <item>
+            <title>Upcoming SSLContext that supports delegation to alternate instances based on peer information</title>
+            <link>
+                https://wildfly-security.github.io/wildfly-elytron/blog/sslcontext-delegation-to-alternate-instances-based-on-peer/
+            </link>
+            <description>
+                One of the features we have been working on for the Elytron subsytem is the ability to configure SSL context that will delegate to different instances of SSL context based on the host and port of the peer. Background In some cases it can be useful to have SSL context...
+            </description>
+            <pubDate>Mon, 15 Mar 2021 00:00:00 +0000</pubDate>
+            <guid>
+                https://wildfly-security.github.io/wildfly-elytron/blog/sslcontext-delegation-to-alternate-instances-based-on-peer/
+            </guid>
+        </item>
+        
+        <item>
+            <title>Upcoming automatic registration of client side / JVM wide default SSLContext</title>
+            <link>
+                https://wildfly-security.github.io/wildfly-elytron/blog/automatic-registration-of-client-side-jvm-wide-default-sslcontext/
+            </link>
+            <description>
+                One of the features we have been working on for the Elytron subsytem is the ability to automatically register client side JVM wide default SSL context. This SSL context will be available to any library that supports the use of the default context. Details We plan to provide implementation of...
+            </description>
+            <pubDate>Mon, 15 Mar 2021 00:00:00 +0000</pubDate>
+            <guid>
+                https://wildfly-security.github.io/wildfly-elytron/blog/automatic-registration-of-client-side-jvm-wide-default-sslcontext/
+            </guid>
+        </item>
         
         <item>
             <title>Normalize principal propagation/injection across elytron and legacy</title>
@@ -116,34 +144,6 @@
             <pubDate>Wed, 14 Oct 2020 00:00:00 +0000</pubDate>
             <guid>
                 https://wildfly-security.github.io/wildfly-elytron/blog/new-security-features-in-wildfly-21/
-            </guid>
-        </item>
-        
-        <item>
-            <title>HTTP External Mechanism</title>
-            <link>
-                https://wildfly-security.github.io/wildfly-elytron/blog/http-external-mechanism/
-            </link>
-            <description>
-                WildFly Elytron now supports authenticating users with the External HTTP mechanism. The External mechanism allows users to be authenticated with credentials established outside the server via the AJP protocol. This means if you have users authenticated by an Apache httpd server, these users can be forwarded to WildFly. This can...
-            </description>
-            <pubDate>Wed, 14 Oct 2020 00:00:00 +0000</pubDate>
-            <guid>
-                https://wildfly-security.github.io/wildfly-elytron/blog/http-external-mechanism/
-            </guid>
-        </item>
-        
-        <item>
-            <title>An overview of new security realm implementations</title>
-            <link>
-                https://wildfly-security.github.io/wildfly-elytron/blog/distributed-and-failover-realms/
-            </link>
-            <description>
-                We have added a new functionality to WildFly Elytron It is now possible to configure security realms that delegate authentication and authorization to multiple realms. Distributed realm First added realm is the distributed-realm, which can be used to join multiple realms into one, for example if you have user data...
-            </description>
-            <pubDate>Wed, 14 Oct 2020 00:00:00 +0000</pubDate>
-            <guid>
-                https://wildfly-security.github.io/wildfly-elytron/blog/distributed-and-failover-realms/
             </guid>
         </item>
         
