@@ -5,33 +5,19 @@
         <title>WildFly Elytron</title>
         <link>https://wildfly-security.github.io/wildfly-elytron</link>
         <description>WildFly Elytron: Security, Authentication, and Authorization SPIs for the WildFly project</description>
-        <lastBuildDate>Mon, 15 Mar 2021 15:52:17 +0000</lastBuildDate>
+        <lastBuildDate>Fri, 19 Mar 2021 15:56:16 +0000</lastBuildDate>
         
         <item>
-            <title>Upcoming SSLContext that supports delegation to alternate instances based on peer information</title>
+            <title>Normalize principal propagation/injection across elytron and legacy</title>
             <link>
-                https://wildfly-security.github.io/wildfly-elytron/blog/sslcontext-delegation-to-alternate-instances-based-on-peer/
+                https://wildfly-security.github.io/wildfly-elytron/blog/normalization-of-EJB-principal-propagation/
             </link>
             <description>
-                One of the features we have been working on for the Elytron subsytem is the ability to configure SSL context that will delegate to different instances of SSL context based on the host and port of the peer. Background In some cases it can be useful to have SSL context...
+                In WildFly 23 there is a new configuration option in the EJB subsystem that allows to switch between legacy and elytron principal propagation. This blog post will provide an explanation about the difference between these propagation modes and where the configuration can be done. Definition of terms Secured EJB refers...
             </description>
-            <pubDate>Mon, 15 Mar 2021 00:00:00 +0000</pubDate>
+            <pubDate>Fri, 19 Mar 2021 00:00:00 +0000</pubDate>
             <guid>
-                https://wildfly-security.github.io/wildfly-elytron/blog/sslcontext-delegation-to-alternate-instances-based-on-peer/
-            </guid>
-        </item>
-        
-        <item>
-            <title>Upcoming automatic registration of client side / JVM wide default SSLContext</title>
-            <link>
-                https://wildfly-security.github.io/wildfly-elytron/blog/automatic-registration-of-client-side-jvm-wide-default-sslcontext/
-            </link>
-            <description>
-                One of the features we have been working on for the Elytron subsytem is the ability to automatically register client side JVM wide default SSL context. This SSL context will be available to any library that supports the use of the default context. Details We plan to provide implementation of...
-            </description>
-            <pubDate>Mon, 15 Mar 2021 00:00:00 +0000</pubDate>
-            <guid>
-                https://wildfly-security.github.io/wildfly-elytron/blog/automatic-registration-of-client-side-jvm-wide-default-sslcontext/
+                https://wildfly-security.github.io/wildfly-elytron/blog/normalization-of-EJB-principal-propagation/
             </guid>
         </item>
         
@@ -144,6 +130,20 @@
             <pubDate>Wed, 14 Oct 2020 00:00:00 +0000</pubDate>
             <guid>
                 https://wildfly-security.github.io/wildfly-elytron/blog/http-external-mechanism/
+            </guid>
+        </item>
+        
+        <item>
+            <title>An overview of new security realm implementations</title>
+            <link>
+                https://wildfly-security.github.io/wildfly-elytron/blog/distributed-and-failover-realms/
+            </link>
+            <description>
+                We have added a new functionality to WildFly Elytron It is now possible to configure security realms that delegate authentication and authorization to multiple realms. Distributed realm First added realm is the distributed-realm, which can be used to join multiple realms into one, for example if you have user data...
+            </description>
+            <pubDate>Wed, 14 Oct 2020 00:00:00 +0000</pubDate>
+            <guid>
+                https://wildfly-security.github.io/wildfly-elytron/blog/distributed-and-failover-realms/
             </guid>
         </item>
         
