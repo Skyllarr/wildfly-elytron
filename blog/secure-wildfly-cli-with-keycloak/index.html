@@ -135,7 +135,7 @@
 </div>
       <div class="grid__item width-12-12">
           <div class="paragraph">
-<p>This blog post will describe how to secure WildFly CLI using Keycloak and Elytron.</p>
+<p>This blog post gives an example of how to secure WildFly CLI using Keycloak and Elytron.</p>
 </div>
 <div class="sect1">
 <h2 id="keycloaks-wildfly-elytron-adapter"><a class="anchor" href="#keycloaks-wildfly-elytron-adapter"></a>Keycloak&#8217;s Wildfly Elytron Adapter</h2>
@@ -181,10 +181,10 @@
 <div class="ulist">
 <ul>
 <li>
-<p>Select <strong>CONFIDENTIAL</strong> in the <strong>Access Type</strong> field</p>
+<p>Select <strong>confidential</strong> in the <strong>Access Type</strong> field</p>
 </li>
 <li>
-<p>Put a value <a href="http://localhost:9990/" class="bare">http://localhost:9990/</a> to <strong>Valid Redirect URI</strong> field</p>
+<p>Put value <a href="http://localhost:9990/" class="bare">http://localhost:9990/</a> to <strong>Valid Redirect URI</strong> field</p>
 </li>
 </ul>
 </div>
@@ -194,7 +194,7 @@
 </div>
 </div>
 <div class="paragraph">
-<p>Now you need to create a user to <code>wildfly-realm</code> and also create an <strong>ADMINISTRATOR</strong> role. You need to add this role to the user in order to grant this user access to the Wildfly CLI.</p>
+<p>Now you need to create a user in <code>wildfly-realm</code> and also create an <strong>ADMINISTRATOR</strong> role. You need to add this role to the user in order to grant this user access to the Wildfly CLI.</p>
 </div>
 <div class="paragraph">
 <p>Finally, you should configure the Keycloak realm to put roles in a top level field in the JWT roken. This is because Keycloak uses the claim <code>realm_access.roles</code> to map roles by default. Since we want to configure role decoder to take roles from the claim <code>Roles</code>, we need to configure Keycloak to use this claim as well. It is of course possible to configure some other claim as well.</p>
@@ -213,7 +213,7 @@
 <h2 id="wildfly-configuration"><a class="anchor" href="#wildfly-configuration"></a>WildFly configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Connect to the WildFly CLI and run the below commands. Make sure you change the <code>&lt;wildfly-cli-client-secret&gt;</code> to match the client secret of the <code>wildfly-cli</code> client. You can find it in the Keycloak Administration Console.</p>
+<p>Connect to the WildFly CLI and run the below commands. Make sure you change the <code>&lt;wildfly-cli-client-secret&gt;</code> to match the client secret of your <code>wildfly-cli</code> client. You can find it in the Keycloak Administration Console.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -231,16 +231,16 @@ reload</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Above configuration ensures that WildFly CLI will require token during authorization. All incoming tokens will be validated using Keycloak&#8217;s token introspection endpoint.</p>
+<p>Above commands configure the WildFly CLI to require token for authorization of users. All incoming tokens will be validated using Keycloak&#8217;s token introspection endpoint.</p>
 </div>
 <div class="paragraph">
-<p>Now you will be asked to provide a token when trying to access WildFly CLI with <code>$WILDFLY_HOME/bin/jboss-cli.sh</code> client.
+<p>You will be asked to provide a token when trying to access WildFly CLI with <code>$WILDFLY_HOME/bin/jboss-cli.sh</code> client again.
 To obtain and provide a token, create a file <code>$WILDFLY_HOME/wildfly-config.xml</code> with the following content:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;configuration&gt;
-    &lt;authentication-client xmlns="urn:elytron:client:1.5"&gt;
+    &lt;authentication-client xmlns="urn:elytron:client:1.6"&gt;
         &lt;authentication-rules&gt;
             &lt;rule use-configuration="myconfig"&gt;
             &lt;/rule&gt;
@@ -248,12 +248,11 @@ To obtain and provide a token, create a file <code>$WILDFLY_HOME/wildfly-config.
         &lt;authentication-configurations&gt;
 	    &lt;configuration name="myconfig"&gt;
 		    &lt;credentials&gt;
-                    &lt;oauth2-bearer-token
-			    token-endpoint-uri="http://localhost:8180/auth/realms/wildfly-realm/protocol/openid-connect/token"&gt;
-                        &lt;resource-owner-credentials name="user-with-ADMINISTRATOR-role"&gt;
-                            &lt;credential-store-reference clear-text="password"/&gt;
-		    &lt;/resource-owner-credentials&gt;
-			    &lt;client-credentials client-id="wildfly-cli" client-secret={client-secret}&gt;
+                &lt;oauth2-bearer-token token-endpoint-uri="http://localhost:8180/auth/realms/wildfly-realm/protocol/openid-connect/token"&gt;
+                    &lt;resource-owner-credentials name="user-with-ADMINISTRATOR-role"&gt;
+                        &lt;credential-store-reference clear-text="password"/&gt;
+		            &lt;/resource-owner-credentials&gt;
+			        &lt;client-credentials client-id="wildfly-cli" client-secret={client-secret}&gt;
                         &lt;/client-credentials&gt;
                     &lt;/oauth2-bearer-token&gt;
                 &lt;/credentials&gt;
@@ -264,10 +263,10 @@ To obtain and provide a token, create a file <code>$WILDFLY_HOME/wildfly-config.
 </div>
 </div>
 <div class="paragraph">
-<p>Make sure you configure you client secret correctly and change the resource owner credentials to match the user you added to your realm. This ensures that the token will be obtained from Keycloak and subsequently sent to the WildFly CLI endpoint.</p>
+<p>Make sure you configure your client secret correctly and change the resource owner credentials to match the user you added to your realm. This configuration ensures that the token will be obtained from Keycloak and subsequently sent to the WildFly CLI endpoint.</p>
 </div>
 <div class="paragraph">
-<p>You can connect to the WildFly CLI with the following command:</p>
+<p>Now you can connect to the WildFly CLI with the following command:</p>
 </div>
 <div class="listingblock">
 <div class="content">
