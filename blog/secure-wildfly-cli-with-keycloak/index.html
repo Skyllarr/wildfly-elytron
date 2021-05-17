@@ -135,7 +135,7 @@
 </div>
       <div class="grid__item width-12-12">
           <div class="paragraph">
-<p>This post will describe how to configure both Keycloak and Wildfly server in order to secure WildFly CLI console using Keycloak and Elytron.</p>
+<p>This post will describe how to configure both Keycloak and Wildfly server in order to secure WildFly CLI using Keycloak and Elytron.</p>
 </div>
 <div class="sect1">
 <h2 id="keycloaks-wildfly-elytron-adapter"><a class="anchor" href="#keycloaks-wildfly-elytron-adapter"></a>Keycloak&#8217;s Wildfly Elytron Adapter</h2>
@@ -168,7 +168,7 @@
 </div>
 </div>
 <div class="paragraph">
-<p>You should be able to access Keycloak Administration Console at <a href="http://localhost:8180/auth" class="bare">http://localhost:8180/auth</a>. If you are running the server for the first time, you should create an initial admin user to get started. Once you provide the username and password for the admin user you&#8217;ll be redirected to Keycloak Administration Console login page.</p>
+<p>You should be able to access Keycloak Administration Console at <a href="http://localhost:8180/auth" class="bare">http://localhost:8180/auth</a>. If you are running the server for the first time, you should create an initial admin user to get started. Once you provide the username and password for the admin user you will be able to log in.</p>
 </div>
 </div>
 </div>
@@ -184,24 +184,27 @@
 <p>Select <strong>CONFIDENTIAL</strong> in the <strong>Access Type</strong> field</p>
 </li>
 <li>
-<p>Add a new <strong>Valid Redirect URI</strong> with a value <a href="http://localhost:9990/" class="bare">http://localhost:9990/</a></p>
+<p>Put a value <a href="http://localhost:9990/" class="bare">http://localhost:9990/</a> to <strong>Valid Redirect URI</strong> field</p>
 </li>
 </ul>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="image/keycloak2.png" alt="keycloak2">
+<img src="../images/keycloakWildflyClientApp.png.png" alt="keycloakWildflyClientApp.png">
 </div>
 </div>
 <div class="paragraph">
-<p>Now we need to create a user to <code>wildfly-realm</code> and also add an <strong>ADMINISTRATOR</strong> role. You need to add this role to the user in order to grant the access to the Wildfly Administration Console.</p>
+<p>Now you need to create a user to <code>wildfly-realm</code> and also create an <strong>ADMINISTRATOR</strong> role. You need to add this role to the user in order to grant this user access to the Wildfly CLI.</p>
 </div>
 <div class="paragraph">
-<p>Finally, you can configure the Keycloak realm to accept roles in a top level field in the JWT roken. This is because Keycloak uses the claim realm_access.roles to map roles by default. You need to configure Elytron role decoder and Keycloak role mapper to match. Any attribute can be configured using a role-decoder in Elytron, but below we will configure it to use the <code>Roles</code> field. To configure the same in Keycloak, go to the client scopes and click on roles. You can find realm roles in the Mappers tab. Change there the <code>realm_access.roles</code> claim to be just <code>Roles</code>.</p>
+<p>Finally, you should configure the Keycloak realm to accept roles in a top level field in the JWT roken. This is because Keycloak uses the claim <code>realm_access.roles</code> to map roles by default. Below we will configure role decoder to take roles from claim <code>Roles</code>, so we will configure Keycloak to use this claim as well. You can also configure some other claim name as well.</p>
+</div>
+<div class="paragraph">
+<p>To configure the claim used for roles in Keycloak, go to the client scopes and click on roles. You should be able to find <code>realm roles</code> in the <code>Mappers</code> tab. Change the <code>realm_access.roles</code> claim to be <code>Roles</code>.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="../images/keycloak.png" alt="keycloak">
+<img src="../images/keycloakRealmRoles.png.png" alt="keycloakRealmRoles.png">
 </div>
 </div>
 </div>
@@ -210,7 +213,7 @@
 <h2 id="wildfly-configuration"><a class="anchor" href="#wildfly-configuration"></a>WildFly configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Connect to the WildFly CLI and run the below commands. Make sure you change the <code>client-secret</code> to match the client secret of the <code>wildfly-cli</code> you can find in Keycloak Administration Console.</p>
+<p>Connect to the WildFly CLI and run the below commands. Make sure you change the <code>client-secret</code> to match the client secret of the <code>wildfly-cli</code> client. You can find this secret in Keycloak Administration Console.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -226,6 +229,9 @@
 
 reload</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Above configuration ensures that WildFly CLI will require token during authorization. All incoming tokens will be validated using Keycloak&#8217;s token introspection endpoint.</p>
 </div>
 <div class="paragraph">
 <p>Now you will be asked to provide a token when trying to access WildFly CLI with <code>$WILDFLY_HOME/bin/jboss-cli.sh</code> client.
@@ -244,7 +250,7 @@ To provide a token, create a file <code>$WILDFLY_HOME/wildfly-config.xml</code> 
 		    &lt;credentials&gt;
                     &lt;oauth2-bearer-token
 			    token-endpoint-uri="http://localhost:8180/auth/realms/wildfly-realm/protocol/openid-connect/token"&gt;
-                        &lt;resource-owner-credentials name="administrator-user"&gt;
+                        &lt;resource-owner-credentials name="user-with-ADMINISTRATOR-role"&gt;
                             &lt;credential-store-reference clear-text="password"/&gt;
 		    &lt;/resource-owner-credentials&gt;
 			    &lt;client-credentials client-id="wildfly-cli" client-secret={client-secret}&gt;
@@ -258,7 +264,7 @@ To provide a token, create a file <code>$WILDFLY_HOME/wildfly-config.xml</code> 
 </div>
 </div>
 <div class="paragraph">
-<p>Make sure you configure you client secret correctly and change the resource owner credentials to match the user you added to your realm.</p>
+<p>Make sure you configure you client secret correctly and change the resource owner credentials to match the user you added to your realm. This ensures that the token will be obtained from Keycloak and subsequently passed to the WildFly CLI endpoint.</p>
 </div>
 <div class="paragraph">
 <p>Now you can connect to the WildFly CLI with the following command:</p>
