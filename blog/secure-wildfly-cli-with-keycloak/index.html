@@ -246,13 +246,15 @@ To obtain and provide a token, create a file <code>$WILDFLY_HOME/wildfly-config.
             &lt;/rule&gt;
         &lt;/authentication-rules&gt;
         &lt;authentication-configurations&gt;
-	    &lt;configuration name="myconfig"&gt;
-		    &lt;credentials&gt;
-                &lt;oauth2-bearer-token token-endpoint-uri="http://localhost:8180/auth/realms/wildfly-realm/protocol/openid-connect/token"&gt;
-                    &lt;resource-owner-credentials name="user-with-ADMINISTRATOR-role"&gt;
-                        &lt;credential-store-reference clear-text="password"/&gt;
-		            &lt;/resource-owner-credentials&gt;
-			        &lt;client-credentials client-id="wildfly-cli" client-secret={client-secret}&gt;
+            &lt;configuration name="myconfig"&gt;
+                &lt;credentials&gt;
+                    &lt;oauth2-bearer-token
+                            token-endpoint-uri="http://localhost:8180/auth/realms/wildfly-realm/protocol/openid-connect/token"&gt;
+                        &lt;resource-owner-credentials name="administrator-user"&gt;
+                            &lt;credential-store-reference clear-text="password"/&gt;
+                        &lt;/resource-owner-credentials&gt;
+                        &lt;client-credentials client-id="wildfly-cli"
+                                            client-secret="6e386017-b557-485b-ae95-d4952be0d89a"&gt;
                         &lt;/client-credentials&gt;
                     &lt;/oauth2-bearer-token&gt;
                 &lt;/credentials&gt;
