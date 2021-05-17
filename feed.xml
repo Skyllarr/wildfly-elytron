@@ -5,7 +5,7 @@
         <title>WildFly Elytron</title>
         <link>https://wildfly-security.github.io/wildfly-elytron</link>
         <description>WildFly Elytron: Security, Authentication, and Authorization SPIs for the WildFly project</description>
-        <lastBuildDate>Mon, 17 May 2021 15:44:18 +0000</lastBuildDate>
+        <lastBuildDate>Mon, 17 May 2021 16:50:40 +0000</lastBuildDate>
         
         <item>
             <title>Secure WildFly CLI with Keycloak</title>
@@ -13,7 +13,7 @@
                 https://wildfly-security.github.io/wildfly-elytron/blog/secure-wildfly-cli-with-keycloak/
             </link>
             <description>
-                This post will describe how to configure both Keycloak and Wildfly server in order to secure WildFly CLI using Keycloak and Elytron. Keycloak&#8217;s Wildfly Elytron Adapter Download WildFly server, Keycloak server and the WildFly OpenID Connect client adapter for WildFly from keycloak.org. Make sure your versions are compatible. Then, extract...
+                This blog post will describe how to secure WildFly CLI using Keycloak and Elytron. Keycloak&#8217;s Wildfly Elytron Adapter Download WildFly server, Keycloak server and the WildFly OpenID Connect client adapter for WildFly from keycloak.org. Make sure your versions are compatible. Then, extract the contents of the client adapter into the...
             </description>
             <pubDate>Thu, 13 May 2021 00:00:00 +0000</pubDate>
             <guid>
