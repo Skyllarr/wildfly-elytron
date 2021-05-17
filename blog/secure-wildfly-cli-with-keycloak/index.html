@@ -135,10 +135,10 @@
 </div>
       <div class="grid__item width-12-12">
           <div class="paragraph">
-<p>This post will describe how to configure both Keycloak and Wildfly in order to secure WildFly CLI console using Elytron.</p>
+<p>This post will describe how to configure both Keycloak and Wildfly server in order to secure WildFly CLI console using Keycloak and Elytron.</p>
 </div>
 <div class="sect1">
-<h2 id="installing-keycloak-wildfly-elytron-adapter"><a class="anchor" href="#installing-keycloak-wildfly-elytron-adapter"></a>Installing Keycloak Wildfly Elytron Adapter</h2>
+<h2 id="keycloaks-wildfly-elytron-adapter"><a class="anchor" href="#keycloaks-wildfly-elytron-adapter"></a>Keycloak&#8217;s Wildfly Elytron Adapter</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Download WildFly server, Keycloak server and the WildFly OpenID Connect client adapter for WildFly from <a href="https://www.keycloak.org/downloads.html">keycloak.org</a>. Make sure your versions are compatible. Then, extract the contents of the client adapter into the root directory of your WildFly server.</p>
@@ -176,7 +176,7 @@
 <h2 id="keycloak-configuration"><a class="anchor" href="#keycloak-configuration"></a>Keycloak configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Create a realm with a name wildfly-realm. Then, create a client application with a name wildfly-cli and configure it as follows:</p>
+<p>Create a realm with a name <code>wildfly-realm</code>. Then, create a client application with a name <code>wildfly-cli</code> and configure it as follows:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -190,18 +190,18 @@
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/keycloak-wildfly-client-app.png" alt="keycloak wildfly client app">
+<img src="../images/keycloak-wildfly-client-app.png" alt="keycloak wildfly client app">
 </div>
 </div>
 <div class="paragraph">
-<p>Now we need to create an user to wildfly-realm and also add an ADMINISTRATOR role. You need to add this role in order to grant this user access to the Wildfly Administration Console.</p>
+<p>Now we need to create a user to <code>wildfly-realm</code> and also add an <strong>ADMINISTRATOR</strong> role. You need to add this role to the user in order to grant the access to the Wildfly Administration Console.</p>
 </div>
 <div class="paragraph">
-<p>Finally we will configure our realm to accept roles in a top level field in the JWT roken. This is because Keycloak uses the claim realm_access.roles to map roles. Since Elytron uses Roles field by default, we will configure a mapper in Keycloak to use it. Any attribute can be configured using a role-decoder in Elytron, but by default it expects a Roles field. Under client scopes click on roles. Tab mappers and choose realm roles. Change realm_access.roles &#8594; Roles.</p>
+<p>Finally, you can configure the Keycloak realm to accept roles in a top level field in the JWT roken. This is because Keycloak uses the claim realm_access.roles to map roles by default. You need to configure Elytron role decoder and Keycloak role mapper to match. Any attribute can be configured using a role-decoder in Elytron, but below we will configure it to use the <code>Roles</code> field. To configure the same in Keycloak, go to the client scopes and click on roles. You can find realm roles in the Mappers tab. Change there the <code>realm_access.roles</code> claim to be just <code>Roles</code>.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/keycloak-role-mapper.png" alt="keycloak role mapper">
+<img src="../images/keycloak-role-mapper.png" alt="keycloak role mapper">
 </div>
 </div>
 </div>
