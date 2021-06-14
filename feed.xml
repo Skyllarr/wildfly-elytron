@@ -5,7 +5,21 @@
         <title>WildFly Elytron</title>
         <link>https://wildfly-security.github.io/wildfly-elytron</link>
         <description>WildFly Elytron: Security, Authentication, and Authorization SPIs for the WildFly project</description>
-        <lastBuildDate>Mon, 14 Jun 2021 15:33:08 +0000</lastBuildDate>
+        <lastBuildDate>Mon, 14 Jun 2021 15:38:31 +0000</lastBuildDate>
+        
+        <item>
+            <title>Secure WildFly CLI with Keycloak</title>
+            <link>
+                https://wildfly-security.github.io/wildfly-elytron/blog/secure-wildfly-cli-with-keycloak/
+            </link>
+            <description>
+                This blog post gives an example of how to secure WildFly CLI using Keycloak and Elytron. Keycloak&#8217;s Wildfly Elytron Adapter Download WildFly server, Keycloak server and the WildFly OpenID Connect client adapter for WildFly from keycloak.org. Make sure your versions are compatible. Then, extract the contents of the client adapter...
+            </description>
+            <pubDate>Sun, 13 Jun 2021 00:00:00 +0000</pubDate>
+            <guid>
+                https://wildfly-security.github.io/wildfly-elytron/blog/secure-wildfly-cli-with-keycloak/
+            </guid>
+        </item>
         
         <item>
             <title>WildFly Encrypted Expression Support</title>
@@ -130,20 +144,6 @@
             <pubDate>Thu, 14 Jan 2021 00:00:00 +0000</pubDate>
             <guid>
                 https://wildfly-security.github.io/wildfly-elytron/blog/auto-self-signed-certificate-generation/
-            </guid>
-        </item>
-        
-        <item>
-            <title>Using case principal transformers in Elytron</title>
-            <link>
-                https://wildfly-security.github.io/wildfly-elytron/blog/case-principal-transformer/
-            </link>
-            <description>
-                The case-principal-transformer quickstart demonstrates how to use a case-principal-transformer to adjust a principal to upper case when securing EJBs. Note, the quickstart is building from this post which more closely explains how to configure filesystem realms and SASL authentication to secure EJBs. An Overview of the Case Principal Transformer Principal...
-            </description>
-            <pubDate>Tue, 12 Jan 2021 00:00:00 +0000</pubDate>
-            <guid>
-                https://wildfly-security.github.io/wildfly-elytron/blog/case-principal-transformer/
             </guid>
         </item>
         
