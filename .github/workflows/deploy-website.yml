@@ -3,7 +3,7 @@ name: deploy-website
 on:
   push:
     branches:
-      - develop
+      - temp
 
 jobs:
   build:

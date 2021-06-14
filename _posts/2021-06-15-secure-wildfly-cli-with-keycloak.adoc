@@ -44,7 +44,7 @@ Create a realm with a name `wildfly-realm`. Then, create a client application wi
 
  *  Put value http://localhost:9990/ to *Valid Redirect URI* field
 
-image::../images/keycloakWildFlyClientApp.png[]
+image::https://skyllarr.github.io/wildfly-elytron/assets/images/posts/2021-06-15-secure-wildfly-cli-with-keycloak-WildFlyClientApp.png[]
 
 Now you need to create a user in `wildfly-realm`. Make sure you configure password for this user as well.
 
@@ -54,7 +54,7 @@ Finally, you should configure the Keycloak realm to put roles in a top level fie
 
 To configure this in Keycloak, go to the client scopes and click on `roles`. You should be able to find `realm roles` in the `Mappers` tab. Change the `Token Claim Name` to be `Roles`.
 
-image::../images/keycloakRealmRoles.png[]
+image::https://skyllarr.github.io/wildfly-elytron/assets/images/posts/2021-06-15-secure-wildfly-cli-with-keycloak-RealmRoles.png[]
 
 == WildFly configuration
 
