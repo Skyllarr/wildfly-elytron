@@ -788,13 +788,10 @@ public class SSLAuthenticationTest {
     }
 
     private void testCommunication(SSLContext serverContext, SSLContext clientContext, String expectedServerPrincipal, String expectedClientPrincipal, boolean oneWay) throws Throwable {
-        SSLServerSocket listeningSocket = (SSLServerSocket) serverContext.getServerSocketFactory().createServerSocket();
-        listeningSocket.setReuseAddress(true);
+        ServerSocket listeningSocket = serverContext.getServerSocketFactory().createServerSocket();
         listeningSocket.bind(new InetSocketAddress("localhost", TESTING_PORT));
         SSLSocket clientSocket = (SSLSocket) clientContext.getSocketFactory().createSocket("localhost", TESTING_PORT);
         SSLSocket serverSocket = (SSLSocket) listeningSocket.accept();
-        serverSocket.setUseClientMode(false);
-        serverSocket.setReuseAddress(true);
 
         ExecutorService serverExecutorService = Executors.newSingleThreadExecutor();
         Future<byte[]> serverFuture = serverExecutorService.submit(() -> {
@@ -815,8 +812,8 @@ public class SSLAuthenticationTest {
                         assertNotNull(identity);
                     }
                 } catch (SocketException e) {
-                    if (e.getMessage().contains("Connection reset by peer") || e.getMessage().contains("Broken pipe")) { // ssl handshake failed and connection from server was
-                        throw new SSLHandshakeException("Client exception");
+                    if (e.getMessage().contains("Connection reset by peer") || e.getMessage().contains("Broken pipe")) { 
+                        throw new SSLHandshakeException("Client terminated the connection and server attempted to write");
                     }
                 }
                 return received;
@@ -845,8 +842,8 @@ public class SSLAuthenticationTest {
                         assertFalse(clientSocket.getSession().getProtocol().equals("TLSv1.3")); // since TLS 1.3 is not enabled by default
                     }
                 } catch (SocketException e) {
-                    if (e.getMessage().contains("Connection reset by peer")) { // ssl handshake failed and connection from server was
-                        throw new SSLHandshakeException("Client exception");
+                    if (e.getMessage().contains("Connection reset by peer")) {
+                        throw new SSLHandshakeException("Server terminated the connection and client attempted to write");
                     }
                 }
                 return received;
@@ -874,7 +871,6 @@ public class SSLAuthenticationTest {
     private void safeClose(Closeable closeable) {
         try {
             closeable.close();
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
     }
 }
