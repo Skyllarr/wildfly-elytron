@@ -27,12 +27,7 @@ import static org.wildfly.security.ssl.test.util.CAGenerationTool.SIGNATURE_ALGO
 import static org.wildfly.security.x500.X500.OID_AD_OCSP;
 import static org.wildfly.security.x500.X500.OID_KP_OCSP_SIGNING;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.SocketException;
@@ -55,17 +50,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLHandshakeException;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509ExtendedKeyManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -75,9 +60,8 @@ import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.openssl.MiscPEMGenerator;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.util.io.pem.PemWriter;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.runners.MethodSorters;
 import org.wildfly.common.Assert;
 import org.wildfly.security.auth.server.SecurityIdentity;
 import org.wildfly.security.password.WildFlyElytronPasswordProvider;
@@ -784,44 +768,65 @@ public class SSLAuthenticationTest {
 
         try {
             testCommunication(serverContext, clientContext, expectedServerPrincipal, expectedClientPrincipal, oneWay);
+//            System.out.println("after testcommunication");
             if (!expectValid) fail("Expected SSLHandshakeException not thrown");
         } catch (SSLHandshakeException expected) {
-            if (expectValid) throw new IllegalStateException("Unexpected SSLHandshakeException", expected);
-        } catch (SSLException expected) {
             if (expectValid) {
+                throw new IllegalStateException("Unexpected SSLHandshakeException", expected);
+            }
+        } catch (SSLException expected) {
+//            expected.printStackTrace();
+            if (expectValid) {
+//                expected.printStackTrace();
                 throw new IllegalStateException("Unexpected SSLException", expected);
             } else if (expected.getCause() instanceof SocketException){
                 //expected
             }
+        } finally {
+            System.clearProperty("wildfly.config.url");
+            Security.removeProvider(WildFlyElytronPasswordProvider.getInstance().getName());
         }
     }
 
     private void testCommunication(SSLContext serverContext, SSLContext clientContext, String expectedServerPrincipal, String expectedClientPrincipal, boolean oneWay) throws Throwable {
-        ServerSocket listeningSocket = serverContext.getServerSocketFactory().createServerSocket();
+        SSLServerSocket listeningSocket = (SSLServerSocket) serverContext.getServerSocketFactory().createServerSocket();
+        listeningSocket.setReuseAddress(true);
         listeningSocket.bind(new InetSocketAddress("localhost", TESTING_PORT));
         SSLSocket clientSocket = (SSLSocket) clientContext.getSocketFactory().createSocket("localhost", TESTING_PORT);
         SSLSocket serverSocket = (SSLSocket) listeningSocket.accept();
+        serverSocket.setUseClientMode(false);
+        serverSocket.setReuseAddress(true);
 
         ExecutorService serverExecutorService = Executors.newSingleThreadExecutor();
         Future<byte[]> serverFuture = serverExecutorService.submit(() -> {
+//            System.out.println("server future start");
             try {
                 byte[] received = new byte[2];
-                serverSocket.getInputStream().read(received);
-                serverSocket.getOutputStream().write(new byte[]{0x56, 0x78});
+//                if (!serverSocket.isClosed()) {
+                    try {
+                    serverSocket.getInputStream().read(received, 0, 2);
+                    OutputStream outputStream = serverSocket.getOutputStream();
+                    outputStream.write(new byte[]{'O', 'K'});
+                    outputStream.flush();
+                    if (expectedClientPrincipal != null) {
+                        assertEquals(expectedClientPrincipal, serverSocket.getSession().getPeerPrincipal().getName());
+                    }
 
-                if (expectedClientPrincipal != null) {
-                    assertEquals(expectedClientPrincipal, serverSocket.getSession().getPeerPrincipal().getName());
+                    SecurityIdentity identity = (SecurityIdentity) serverSocket.getSession().getValue(SSLUtils.SSL_SESSION_IDENTITY_KEY);
+                    if (oneWay) {
+                        assertNull(identity);
+                    } else {
+                        assertNotNull(identity);
+                    }
+                }catch (SocketException e) {
+                    if (e.getMessage().contains("Connection reset by peer")) { // ssl handshake failed and connection from server was
+                        throw new SSLHandshakeException("Client exception");
+                    }
                 }
-
-                SecurityIdentity identity = (SecurityIdentity) serverSocket.getSession().getValue(SSLUtils.SSL_SESSION_IDENTITY_KEY);
-                if (oneWay) {
-                    assertNull(identity);
-                } else {
-                    assertNotNull(identity);
-                }
-
+//                }
                 return received;
             } catch (Exception e) {
+//                e.printStackTrace();
                 throw new RuntimeException("Server exception", e);
             }
         });
@@ -830,18 +835,31 @@ public class SSLAuthenticationTest {
         Future<byte[]> clientFuture = clientExecutorService.submit(() -> {
             try {
                 byte[] received = new byte[2];
-                clientSocket.getOutputStream().write(new byte[]{0x12, 0x34});
-                clientSocket.getInputStream().read(received);
+                    OutputStream outputStream = clientSocket.getOutputStream();
+                if (!clientSocket.isClosed()) {
+                    try {
+                        outputStream.write(new byte[]{'O', 'K'});
+                        outputStream.flush();
 
-                if (expectedServerPrincipal != null) {
-                    assertEquals(expectedServerPrincipal, clientSocket.getSession().getPeerPrincipal().getName());
-                }
+                        InputStream inputStream = clientSocket.getInputStream();
+                        inputStream.read(received);
 
-                if (oneWay) {
-                    assertFalse(clientSocket.getSession().getProtocol().equals("TLSv1.3")); // since TLS 1.3 is not enabled by default (ELY-1917)
-                } else {
-                    assertFalse(serverSocket.getSession().getProtocol().equals("TLSv1.3")); // since TLS 1.3 is not enabled by default
-                    assertFalse(clientSocket.getSession().getProtocol().equals("TLSv1.3")); // since TLS 1.3 is not enabled by default
+                        if (expectedServerPrincipal != null) {
+                            assertEquals(expectedServerPrincipal, clientSocket.getSession().getPeerPrincipal().getName());
+                        }
+
+                        if (oneWay) {
+                            assertFalse(clientSocket.getSession().getProtocol().equals("TLSv1.3")); // since TLS 1.3 is not enabled by default (ELY-1917)
+                        } else {
+                            assertFalse(serverSocket.getSession().getProtocol().equals("TLSv1.3")); // since TLS 1.3 is not enabled by default
+                            assertFalse(clientSocket.getSession().getProtocol().equals("TLSv1.3")); // since TLS 1.3 is not enabled by default
+                        }
+                    } catch (SocketException e) {
+                        if (e.getMessage().contains("Connection reset by peer") || e.getMessage().contains("Socket is closed") || e.getMessage().contains("Broken pipe")) { // ssl handshake failed and connection from server was
+
+                            throw new SSLHandshakeException("Client exception");
+                        }
+                    }
                 }
                 return received;
             } catch (Exception e) {
@@ -850,9 +868,10 @@ public class SSLAuthenticationTest {
         });
 
         try {
-            assertArrayEquals(new byte[]{0x12, 0x34}, serverFuture.get());
-            assertArrayEquals(new byte[]{0x56, 0x78}, clientFuture.get());
+            assertArrayEquals(new byte[]{'O', 'K'}, clientFuture.get());
+            assertArrayEquals(new byte[]{'O', 'K'}, serverFuture.get());
         } catch (ExecutionException e) {
+//            e.printStackTrace();
             if (e.getCause() != null && e.getCause() instanceof RuntimeException && e.getCause().getCause() != null) {
                 throw e.getCause().getCause(); // unpack
             } else {
@@ -861,13 +880,19 @@ public class SSLAuthenticationTest {
         } finally {
             safeClose(serverSocket);
             safeClose(clientSocket);
-            safeClose(listeningSocket);
+            listeningSocket.close();
         }
     }
 
-    private void safeClose(Closeable closeable) {
+    private void safeClose(SSLSocket closeable) throws IOException {
         try {
+//            closeable.getInputStream().close();
+//            closeable.getOutputStream().flush();
+//            closeable.getOutputStream().close();
             closeable.close();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+//            ignored.printStackTrace();
+            throw ignored;
+        }
     }
 }
