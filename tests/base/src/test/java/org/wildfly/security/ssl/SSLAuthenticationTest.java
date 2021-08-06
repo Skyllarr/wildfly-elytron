@@ -804,22 +804,21 @@ public class SSLAuthenticationTest {
                 byte[] received = new byte[2];
 //                if (!serverSocket.isClosed()) {
                     try {
-                    serverSocket.getInputStream().read(received, 0, 2);
-                    OutputStream outputStream = serverSocket.getOutputStream();
-                    outputStream.write(new byte[]{'O', 'K'});
-                    outputStream.flush();
-                    if (expectedClientPrincipal != null) {
-                        assertEquals(expectedClientPrincipal, serverSocket.getSession().getPeerPrincipal().getName());
-                    }
+                        serverSocket.getInputStream().read(received);
+                        serverSocket.getOutputStream().write(new byte[]{0x56, 0x78});
 
-                    SecurityIdentity identity = (SecurityIdentity) serverSocket.getSession().getValue(SSLUtils.SSL_SESSION_IDENTITY_KEY);
+                        if (expectedClientPrincipal != null) {
+                            assertEquals(expectedClientPrincipal, serverSocket.getSession().getPeerPrincipal().getName());
+                        }
+
+                        SecurityIdentity identity = (SecurityIdentity) serverSocket.getSession().getValue(SSLUtils.SSL_SESSION_IDENTITY_KEY);
                     if (oneWay) {
                         assertNull(identity);
                     } else {
                         assertNotNull(identity);
                     }
                 }catch (SocketException e) {
-                    if (e.getMessage().contains("Connection reset by peer")) { // ssl handshake failed and connection from server was
+                    if (e.getMessage().contains("Connection reset by peer") || e.getMessage().contains("Broken pipe")) { // ssl handshake failed and connection from server was
                         throw new SSLHandshakeException("Client exception");
                     }
                 }
@@ -835,14 +834,11 @@ public class SSLAuthenticationTest {
         Future<byte[]> clientFuture = clientExecutorService.submit(() -> {
             try {
                 byte[] received = new byte[2];
-                    OutputStream outputStream = clientSocket.getOutputStream();
-                if (!clientSocket.isClosed()) {
+//                if (!clientSocket.isClosed()) {
                     try {
-                        outputStream.write(new byte[]{'O', 'K'});
-                        outputStream.flush();
+                        clientSocket.getOutputStream().write(new byte[]{0x12, 0x34});
+                        clientSocket.getInputStream().read(received);
 
-                        InputStream inputStream = clientSocket.getInputStream();
-                        inputStream.read(received);
 
                         if (expectedServerPrincipal != null) {
                             assertEquals(expectedServerPrincipal, clientSocket.getSession().getPeerPrincipal().getName());
@@ -855,12 +851,12 @@ public class SSLAuthenticationTest {
                             assertFalse(clientSocket.getSession().getProtocol().equals("TLSv1.3")); // since TLS 1.3 is not enabled by default
                         }
                     } catch (SocketException e) {
-                        if (e.getMessage().contains("Connection reset by peer") || e.getMessage().contains("Socket is closed") || e.getMessage().contains("Broken pipe")) { // ssl handshake failed and connection from server was
+                        if (e.getMessage().contains("Connection reset by peer") || e.getMessage().contains("Broken pipe")) { // ssl handshake failed and connection from server was
 
                             throw new SSLHandshakeException("Client exception");
                         }
                     }
-                }
+//                }
                 return received;
             } catch (Exception e) {
                 throw new RuntimeException("Client exception", e);
@@ -868,8 +864,8 @@ public class SSLAuthenticationTest {
         });
 
         try {
-            assertArrayEquals(new byte[]{'O', 'K'}, clientFuture.get());
-            assertArrayEquals(new byte[]{'O', 'K'}, serverFuture.get());
+            assertArrayEquals(new byte[]{0x12, 0x34}, serverFuture.get());
+            assertArrayEquals(new byte[]{0x56, 0x78}, clientFuture.get());
         } catch (ExecutionException e) {
 //            e.printStackTrace();
             if (e.getCause() != null && e.getCause() instanceof RuntimeException && e.getCause().getCause() != null) {
@@ -880,19 +876,15 @@ public class SSLAuthenticationTest {
         } finally {
             safeClose(serverSocket);
             safeClose(clientSocket);
-            listeningSocket.close();
+            safeClose(listeningSocket);
         }
     }
 
-    private void safeClose(SSLSocket closeable) throws IOException {
+    private void safeClose(Closeable closeable) throws IOException {
         try {
-//            closeable.getInputStream().close();
-//            closeable.getOutputStream().flush();
-//            closeable.getOutputStream().close();
             closeable.close();
         } catch (Exception ignored) {
-//            ignored.printStackTrace();
-            throw ignored;
+//            throw ignored;
         }
     }
 }
