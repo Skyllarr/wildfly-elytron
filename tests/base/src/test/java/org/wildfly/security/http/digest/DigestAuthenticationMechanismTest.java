@@ -85,7 +85,7 @@ public class DigestAuthenticationMechanismTest extends AbstractBaseHttpTest {
                         "                 qop=auth,\n" +
                         "                 nc=00000001,\n" +
                         "                 cnonce=\"0a4f113b\",\n" +
-                        "                 response=\"" + computeDigest("WEB-INF%2Fbeans.xml") + "\",\n" +
+                        "                 response=\"" + computeDigest("WEB-INF%2Fbeans.xml", "dcd98b7102dd2f0e8b11d0f600bfb0c093", "0a4f113b", "00000001") + "\",\n" +
                         "                 opaque=\"00000000000000000000000000000000\",\n" +
                         "                 algorithm=MD5"
         });
@@ -93,7 +93,7 @@ public class DigestAuthenticationMechanismTest extends AbstractBaseHttpTest {
         Assert.assertEquals(Status.COMPLETE, request2.getResult());
     }
 
-    private String computeDigest(String uri) throws NoSuchAlgorithmException {
+    private String computeDigest(String uri, String nonce, String cnonce, String nc) throws NoSuchAlgorithmException {
         String A1, HashA1;
         MessageDigest md = MessageDigest.getInstance("MD5");
         A1 = "Mufasa" + ":" + "testrealm@host.com" + ":";
@@ -102,8 +102,8 @@ public class DigestAuthenticationMechanismTest extends AbstractBaseHttpTest {
         A2 = "GET" + ":" + uri;
         String HashA2 = encode(A2, null, md);
         String combo, finalHash;
-        combo = HashA1 + ":" + "dcd98b7102dd2f0e8b11d0f600bfb0c093" + ":" + "00000001" + ":" +
-                "0a4f113b" + ":auth:" + HashA2;
+        combo = HashA1 + ":" + nonce + ":" + nc + ":" +
+                cnonce + ":auth:" + HashA2;
         finalHash = encode(combo, null, md);
         return finalHash;
     }
@@ -151,7 +151,7 @@ public class DigestAuthenticationMechanismTest extends AbstractBaseHttpTest {
                 "                 qop=auth,\n" +
                 "                 nc=00000001,\n" +
                 "                 cnonce=\"0a4f113b\",\n" +
-                "                 response=\"" + computeDigest("/dir/index.html") + "\",\n" +
+                "                 response=\"" + computeDigest("/dir/index.html", "dcd98b7102dd2f0e8b11d0f600bfb0c093", "0a4f113b", "00000001") + "\",\n" +
                 "                 opaque=\"00000000000000000000000000000000\",\n" +
                 "                 algorithm=MD5"
         });
