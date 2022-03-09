@@ -28,8 +28,11 @@ import org.junit.runner.RunWith;
 import org.wildfly.security.http.HttpServerAuthenticationMechanism;
 import org.wildfly.security.http.impl.AbstractBaseHttpTest;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,6 +77,72 @@ public class DigestAuthenticationMechanismTest extends AbstractBaseHttpTest {
         Assert.assertEquals(UNAUTHORIZED, response.getStatusCode());
         Assert.assertEquals("Digest realm=\"testrealm@host.com\", nonce=\"AAAAAQABsxiWa25/kpFxsPCrpDCFsjkTzs/Xr7RPsi/VVN6faYp21Hia3h4=\", opaque=\"00000000000000000000000000000000\", algorithm=MD5, qop=auth", response.getAuthenticateHeader());
 
+        TestingHttpServerRequest request2 = new TestingHttpServerRequest(new String[]{
+                "Digest username=\"Mufasa\",\n" +
+                        "                 realm=\"testrealm@host.com\",\n" +
+                        "                 nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\",\n" +
+                        "                 uri=\"WEB-INF%2Fbeans.xml\",\n" +
+                        "                 qop=auth,\n" +
+                        "                 nc=00000001,\n" +
+                        "                 cnonce=\"0a4f113b\",\n" +
+                        "                 response=\"" + computeDigest("WEB-INF%2Fbeans.xml") + "\",\n" +
+                        "                 opaque=\"00000000000000000000000000000000\",\n" +
+                        "                 algorithm=MD5"
+        });
+        mechanism.evaluateRequest(request2);
+        Assert.assertEquals(Status.COMPLETE, request2.getResult());
+    }
+
+    private String computeDigest(String uri) throws NoSuchAlgorithmException {
+        String A1, HashA1;
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        A1 = "Mufasa" + ":" + "testrealm@host.com" + ":";
+        HashA1 = encode(A1, "Circle Of Life".toCharArray(), md);
+        String A2;
+        A2 = "GET" + ":" + uri;
+        String HashA2 = encode(A2, null, md);
+        String combo, finalHash;
+        combo = HashA1 + ":" + "dcd98b7102dd2f0e8b11d0f600bfb0c093" + ":" + "00000001" + ":" +
+                "0a4f113b" + ":auth:" + HashA2;
+        finalHash = encode(combo, null, md);
+        return finalHash;
+    }
+
+    private String encode(String src, char[] passwd, MessageDigest md) {
+        char charArray[] = {
+                '0', '1', '2', '3', '4', '5', '6', '7',
+                '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+        };
+        try {
+            md.update(src.getBytes("ISO-8859-1"));
+        } catch (java.io.UnsupportedEncodingException uee) {
+            assert false;
+        }
+        if (passwd != null) {
+            byte[] passwdBytes = new byte[passwd.length];
+            for (int i=0; i<passwd.length; i++)
+                passwdBytes[i] = (byte)passwd[i];
+            md.update(passwdBytes);
+            Arrays.fill(passwdBytes, (byte)0x00);
+        }
+        byte[] digest = md.digest();
+        StringBuffer res = new StringBuffer(digest.length * 2);
+        for (int i = 0; i < digest.length; i++) {
+            int hashchar = ((digest[i] >>> 4) & 0xf);
+            res.append(charArray[hashchar]);
+            hashchar = (digest[i] & 0xf);
+            res.append(charArray[hashchar]);
+        }
+        return res.toString();
+    }
+
+    @Test
+    public void testRfc2617b() throws Exception {
+        mockDigestNonce("AAAAAQABsxiWa25/kpFxsPCrpDCFsjkTzs/Xr7RPsi/VVN6faYp21Hia3h4=");
+        Map<String, Object> props = new HashMap<>();
+        props.put(CONFIG_REALM, "testrealm@host.com");
+        props.put("org.wildfly.security.http.validate-digest-uri", "false");
+        HttpServerAuthenticationMechanism mechanism = digestFactory.createAuthenticationMechanism(DIGEST_NAME, props, getCallbackHandler("Mufasa", "testrealm@host.com", "Circle Of Life"));
         TestingHttpServerRequest request2 = new TestingHttpServerRequest(new String[] {
                 "Digest username=\"Mufasa\",\n" +
                 "                 realm=\"testrealm@host.com\",\n" +
@@ -82,7 +151,7 @@ public class DigestAuthenticationMechanismTest extends AbstractBaseHttpTest {
                 "                 qop=auth,\n" +
                 "                 nc=00000001,\n" +
                 "                 cnonce=\"0a4f113b\",\n" +
-                "                 response=\"6629fae49393a05397450978507c4ef1\",\n" +
+                "                 response=\"" + computeDigest("/dir/index.html") + "\",\n" +
                 "                 opaque=\"00000000000000000000000000000000\",\n" +
                 "                 algorithm=MD5"
         });
