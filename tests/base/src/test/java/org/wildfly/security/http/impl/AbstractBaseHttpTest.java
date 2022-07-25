@@ -78,6 +78,7 @@ import org.wildfly.security.http.basic.BasicMechanismFactory;
 import org.wildfly.security.http.digest.DigestMechanismFactory;
 import org.wildfly.security.http.digest.NonceManager;
 import org.wildfly.security.http.external.ExternalMechanismFactory;
+import org.wildfly.security.http.form.FormMechanismFactory;
 import org.wildfly.security.password.Password;
 import org.wildfly.security.password.PasswordFactory;
 import org.wildfly.security.password.interfaces.ClearPassword;
@@ -90,6 +91,7 @@ import mockit.MockUp;
 public class AbstractBaseHttpTest {
 
     protected HttpServerAuthenticationMechanismFactory basicFactory = new BasicMechanismFactory(ELYTRON_PASSWORD_PROVIDERS.get());
+    protected HttpServerAuthenticationMechanismFactory formFactory = new FormMechanismFactory(ELYTRON_PASSWORD_PROVIDERS.get());
     protected HttpServerAuthenticationMechanismFactory digestFactory = new DigestMechanismFactory(ELYTRON_PASSWORD_PROVIDERS.get());
     protected final HttpServerAuthenticationMechanismFactory externalFactory = new ExternalMechanismFactory(ELYTRON_PASSWORD_PROVIDERS.get());
     protected HttpServerAuthenticationMechanismFactory statefulBasicFactory = new org.wildfly.security.http.sfbasic.BasicMechanismFactory(ELYTRON_PASSWORD_PROVIDERS.get());
@@ -137,6 +139,7 @@ public class AbstractBaseHttpTest {
         private List<HttpServerCookie> cookies;
         private String requestMethod = "GET";
         private Map<String, List<String>> requestHeaders = new HashMap<>();
+        private String method;
 
         public TestingHttpServerRequest(String[] authorization) {
             if (authorization != null) {
@@ -144,6 +147,16 @@ public class AbstractBaseHttpTest {
             }
             this.remoteUser = null;
             this.cookies = new ArrayList<>();
+        }
+
+        public TestingHttpServerRequest(String[] authorization, String method, URI requestURI) {
+            if (authorization != null) {
+                requestHeaders.put(AUTHORIZATION, Arrays.asList(authorization));
+            }
+            this.remoteUser = null;
+            this.requestURI = requestURI;
+            this.cookies = new ArrayList<>();
+            this.requestMethod = method;
         }
 
         public TestingHttpServerRequest(String[] authorization, URI requestURI) {
@@ -284,6 +297,9 @@ public class AbstractBaseHttpTest {
         }
 
         public String getRequestMethod() {
+            if (requestMethod == null){
+                return "GET";
+            }
             return requestMethod;
         }
 
@@ -308,6 +324,12 @@ public class AbstractBaseHttpTest {
         }
 
         public String getFirstParameterValue(String name) {
+            if (name == "j_username"){
+                return requestHeaders.get(AUTHORIZATION).get(0);
+            }
+            if (name == "j_password"){
+                return requestHeaders.get(AUTHORIZATION).get(1);
+            }
             throw new IllegalStateException();
         }
 
@@ -434,7 +456,7 @@ public class AbstractBaseHttpTest {
         }
 
         public boolean forward(String path) {
-            throw new IllegalStateException();
+            return false;
         }
     }
 
@@ -570,6 +592,9 @@ public class AbstractBaseHttpTest {
         }
 
         public String getRequestMethod() {
+            if (requestMethod == null){
+                return "GET";
+            }
             return requestMethod;
         }
 
