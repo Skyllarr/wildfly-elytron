@@ -20,6 +20,7 @@ package org.wildfly.security.authz;
 
 import static org.wildfly.common.Assert.checkNotNullParam;
 import static org.wildfly.common.Assert.checkNotEmptyParam;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;

@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.security.cert.Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ import org.wildfly.security.auth.callback.CredentialCallback;
 import org.wildfly.security.auth.callback.EvidenceVerifyCallback;
 import org.wildfly.security.auth.callback.IdentityCredentialCallback;
 import org.wildfly.security.auth.server.SecurityIdentity;
+import org.wildfly.security.authz.Roles;
 import org.wildfly.security.credential.Credential;
 import org.wildfly.security.credential.PasswordCredential;
 import org.wildfly.security.evidence.PasswordGuessEvidence;
@@ -100,6 +102,19 @@ public class AbstractBaseHttpTest {
                 return true;
             }
         };
+    }
+
+    protected SecurityIdentity mockSecurityIdentity(Principal p) {
+        return new MockUp<SecurityIdentity>() {
+            @Mock
+            public Principal getPrincipal() {
+                return p;
+            }
+            @Mock
+            public Roles getRoles() {
+                return Roles.NONE;
+            }
+        }.getMockInstance();
     }
 
     protected enum Status {
