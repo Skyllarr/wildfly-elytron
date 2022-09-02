@@ -55,6 +55,10 @@
     </scm>
 
     <properties>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.basedir}/wildfly-elytron/target/site/
+            jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
         <jdk.min.version>11</jdk.min.version>
         <version.com.fasterxml.jackson>2.13.3</version.com.fasterxml.jackson>
         <version.commons-cli>1.4</version.commons-cli>
@@ -133,7 +137,7 @@
             </resource>
         </resources>
 
-        <plugins>        
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -218,7 +222,37 @@
                 <artifactId>depgraph-maven-plugin</artifactId>
                 <version>3.2.2</version>
             </plugin>
-            
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.7</version>
+                <configuration>
+                    <destFile>${project.basedir}/target/jacoco.exec</destFile>
+                    <append>true</append>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <configuration>
+                            <!--<excludes>-->
+                                <!--<exclude>*</exclude>-->
+                            <!--</excludes>-->
+                            <!--<includes>-->
+                                <!--<include>*</include>-->
+                            <!--</includes>-->
+                        </configuration>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
         <pluginManagement>
@@ -244,7 +278,7 @@
                         </includes>
                         <childDelegation>true</childDelegation>
                         <reuseForks>false</reuseForks>
-                        <argLine>-javaagent:${settings.localRepository}/org/jmockit/jmockit/${version.jmockit}/jmockit-${version.jmockit}.jar ${modular.jdk.args} ${modular.jdk.props}</argLine>
+                        <argLine>-javaagent:${settings.localRepository}/org/jmockit/jmockit/${version.jmockit}/jmockit-${version.jmockit}.jar ${modular.jdk.args} ${modular.jdk.props} ${argLine} </argLine>
                         <!-- See also excludedGroups property in profiles -->
                     </configuration>
                 </plugin>
@@ -1309,6 +1343,61 @@
             </properties>
         </profile>
 
+        <!--<profile>-->
+            <!--<id>ts.jacoco.profile</id>-->
+            <!--<activation>-->
+                <!--<property>-->
+                    <!--<name>coverage</name>-->
+                <!--</property>-->
+            <!--</activation>-->
+            <!--<build>-->
+                <!--<plugins>-->
+                    <!--<plugin>-->
+                        <!--<groupId>org.jacoco</groupId>-->
+                        <!--<artifactId>jacoco-maven-plugin</artifactId>-->
+                        <!--<version>0.8.0</version>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>ts.jacoco-prepare</id>-->
+                                <!--<phase>process-test-classes</phase>-->
+                                <!--<goals>-->
+                                    <!--<goal>prepare-agent</goal>-->
+                                <!--</goals>-->
+                                <!--<configuration>-->
+                                    <!--<append>true</append>-->
+                                    <!--<destFile>target/jacoco.exec</destFile>-->
+                                    <!--<includes>-->
+                                        <!--<include>*</include>-->
+                                    <!--</includes>-->
+                                    <!--&lt;!&ndash;<excludes>&ndash;&gt;-->
+                                        <!--&lt;!&ndash;<exclude>org.jboss.as.test.*</exclude>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;</excludes>&ndash;&gt;-->
+                                    <!--<output>file</output>-->
+                                    <!--<propertyName>surefire.jacoco.args</propertyName>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
+                <!--</plugins>-->
+            <!--</build>-->
+        <!--</profile>-->
+
+        <!--
+            This profile is needed for the jacoco plugin as the jacoco plugin is unable to replace surefire.jacoco.args
+            property if this property is defined in main properties section of the pom file
+          -->
+        <!--<profile>-->
+            <!--<id>ts.jacoco.profile.not.enabled</id>-->
+            <!--<activation>-->
+                <!--<property>-->
+                    <!--<name>!coverage</name>-->
+                <!--</property>-->
+            <!--</activation>-->
+            <!--<properties>-->
+                <!--<surefire.jacoco.args></surefire.jacoco.args>-->
+            <!--</properties>-->
+        <!--</profile>-->
+
         <profile>
             <id>skip-default-tests</id>
             <build>
@@ -1357,6 +1446,25 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.8.7</version>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -1373,6 +1481,25 @@
             </properties>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.8.7</version>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <executions>
