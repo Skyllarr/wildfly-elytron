@@ -29,6 +29,15 @@ public final class NullSecurityFactory<T> implements SecurityFactory<T> {
 
     static final NullSecurityFactory<Object> INSTANCE = new NullSecurityFactory<>();
 
+    private boolean myMethodFix() {
+        return false;
+    }
+
+    @Test
+    private addTest() {
+        test;
+    }
+
     NullSecurityFactory() {
     }
 
