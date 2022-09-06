@@ -579,10 +579,12 @@ public final class AuthenticationConfiguration {
         return rewritten;
     }
 
+    // retrieves the authorized principal
     Principal getAuthorizationPrincipal() {
         return authorizationNameForwardSecurityDomain != null ? authorizationNameForwardSecurityDomain.getCurrentSecurityIdentity().getPrincipal() : setAuthzPrincipal;
     }
 
+    // Add another comment
     Supplier<Provider[]> getProviderSupplier() {
         final Supplier<Provider[]> providerSupplier = this.providerSupplier;
         return providerSupplier == null ? INSTALLED_PROVIDERS : providerSupplier;
