@@ -92,6 +92,7 @@ public class AbstractBaseHttpTest {
     protected HttpServerAuthenticationMechanismFactory digestFactory = new DigestMechanismFactory(ELYTRON_PASSWORD_PROVIDERS.get());
     protected final HttpServerAuthenticationMechanismFactory externalFactory = new ExternalMechanismFactory(ELYTRON_PASSWORD_PROVIDERS.get());
     protected HttpServerAuthenticationMechanismFactory statefulBasicFactory = new org.wildfly.security.http.sfbasic.BasicMechanismFactory(ELYTRON_PASSWORD_PROVIDERS.get());
+    protected HttpServerAuthenticationMechanismFactory bearerFactory = new org.wildfly.security.http.bearer.BearerMechanismFactory(ELYTRON_PASSWORD_PROVIDERS.get());
 
     protected void mockDigestNonce(final String nonce){
         new MockUp<NonceManager>(){

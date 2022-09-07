@@ -18,6 +18,7 @@
 
 package org.wildfly.security.http.external;
 
+import static org.wildfly.security.http.HttpConstants.BEARER_TOKEN;
 import static org.wildfly.security.http.HttpConstants.EXTERNAL_NAME;
 import static org.wildfly.security.http.HttpConstants.FORBIDDEN;
 
@@ -73,6 +74,30 @@ public class ExternalAuthenticationMechanismTest extends AbstractBaseHttpTest {
 
         //Test successful authentication
         TestingHttpServerRequest request3 = new TestingHttpServerRequest(null);
+        request3.setRemoteUser("remoteUser");
+        mechanism.evaluateRequest(request3);
+        Assert.assertEquals(Status.COMPLETE, request3.getResult());
+    }
+
+
+    @Test
+    public void testBearerAuthenticationMechanism() throws Exception {
+        HttpServerAuthenticationMechanism mechanism = bearerFactory.createAuthenticationMechanism(BEARER_TOKEN, Collections.emptyMap(), getCallbackHandler("remoteUser", "testrealm@host.com", null));
+
+        //Test no authentication in progress (no remote user passed in externally)
+        TestingHttpServerRequest request1 = new TestingHttpServerRequest(new String[] {"Bearer random"});
+        mechanism.evaluateRequest(request1);
+        Assert.assertEquals(Status.NO_AUTH, request1.getResult());
+
+        //Test unsuccessful authentication
+        TestingHttpServerRequest request2 = new TestingHttpServerRequest(new String[] {"Bearer random"});
+        request2.setRemoteUser("wrongUser");
+        mechanism.evaluateRequest(request2);
+        Assert.assertEquals(Status.FAILED, request2.getResult());
+        Assert.assertEquals(FORBIDDEN, request2.getResponse().getStatusCode());
+
+        //Test successful authentication
+        TestingHttpServerRequest request3 = new TestingHttpServerRequest(new String[] {"Bearer random"});
         request3.setRemoteUser("remoteUser");
         mechanism.evaluateRequest(request3);
         Assert.assertEquals(Status.COMPLETE, request3.getResult());
