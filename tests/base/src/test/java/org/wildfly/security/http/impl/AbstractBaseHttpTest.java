@@ -61,8 +61,10 @@ import org.wildfly.security.auth.callback.CredentialCallback;
 import org.wildfly.security.auth.callback.EvidenceVerifyCallback;
 import org.wildfly.security.auth.callback.IdentityCredentialCallback;
 import org.wildfly.security.auth.server.SecurityIdentity;
+import org.wildfly.security.credential.BearerTokenCredential;
 import org.wildfly.security.credential.Credential;
 import org.wildfly.security.credential.PasswordCredential;
+import org.wildfly.security.evidence.BearerTokenEvidence;
 import org.wildfly.security.evidence.PasswordGuessEvidence;
 import org.wildfly.security.http.HttpAuthenticationException;
 import org.wildfly.security.http.HttpExchangeSpi;
@@ -434,7 +436,7 @@ public class AbstractBaseHttpTest {
         }
     }
 
-    protected CallbackHandler getCallbackHandler(String username, String realm, String password) {
+    protected CallbackHandler getCallbackHandler(String username, String realm, String password, String token) {
         return callbacks -> {
             for(Callback callback : callbacks) {
                 if (callback instanceof AvailableRealmsCallback) {
@@ -455,23 +457,42 @@ public class AbstractBaseHttpTest {
                         throw new IllegalStateException(e);
                     }
                 } else if (callback instanceof EvidenceVerifyCallback) {
-                    PasswordGuessEvidence evidence = (PasswordGuessEvidence) ((EvidenceVerifyCallback) callback).getEvidence();
-                    ((EvidenceVerifyCallback) callback).setVerified(Arrays.equals(evidence.getGuess(), password.toCharArray()));
-                    evidence.destroy();
+                    if (((EvidenceVerifyCallback) callback).getEvidence() instanceof BearerTokenEvidence) {
+                        BearerTokenEvidence evidence = (BearerTokenEvidence) ((EvidenceVerifyCallback) callback).getEvidence();
+                        ((EvidenceVerifyCallback) callback).setVerified(token.equals(evidence.getToken()));
+
+                    } else {
+                        PasswordGuessEvidence evidence = (PasswordGuessEvidence) ((EvidenceVerifyCallback) callback).getEvidence();
+                        ((EvidenceVerifyCallback) callback).setVerified(Arrays.equals(evidence.getGuess(), password.toCharArray()));
+                        evidence.destroy();
+                    }
                 } else if (callback instanceof AuthenticationCompleteCallback) {
                     // NO-OP
                 } else if (callback instanceof IdentityCredentialCallback) {
                     Credential credential = ((IdentityCredentialCallback) callback).getCredential();
-                    MatcherAssert.assertThat(credential, CoreMatchers.instanceOf(PasswordCredential.class));
-                    ClearPassword clearPwdCredential = ((PasswordCredential) credential).getPassword().castAs(ClearPassword.class);
-                    Assert.assertNotNull(clearPwdCredential);
-                    Assert.assertArrayEquals(password.toCharArray(), clearPwdCredential.getPassword());
+                    if (credential instanceof BearerTokenCredential) {
+                        MatcherAssert.assertThat(credential, CoreMatchers.instanceOf(BearerTokenCredential.class));
+                        String clearPwdCredential = ((BearerTokenCredential) credential).getToken().toString();
+                        Assert.assertNotNull(clearPwdCredential);
+                        token.equals(clearPwdCredential);
+                    } else {
+                        MatcherAssert.assertThat(credential, CoreMatchers.instanceOf(PasswordCredential.class));
+                        ClearPassword clearPwdCredential = ((PasswordCredential) credential).getPassword().castAs(ClearPassword.class);
+                        Assert.assertNotNull(clearPwdCredential);
+                        Assert.assertArrayEquals(password.toCharArray(), clearPwdCredential.getPassword());
+                    }
+
+
                 } else if (callback instanceof AuthorizeCallback) {
-                    if(username.equals(((AuthorizeCallback) callback).getAuthenticationID()) &&
-                       username.equals(((AuthorizeCallback) callback).getAuthorizationID())) {
+                    if (token != null) {
                         ((AuthorizeCallback) callback).setAuthorized(true);
                     } else {
-                        ((AuthorizeCallback) callback).setAuthorized(false);
+                        if (username.equals(((AuthorizeCallback) callback).getAuthenticationID()) &&
+                                username.equals(((AuthorizeCallback) callback).getAuthorizationID())) {
+                            ((AuthorizeCallback) callback).setAuthorized(true);
+                        } else {
+                            ((AuthorizeCallback) callback).setAuthorized(false);
+                        }
                     }
                 } else if (callback instanceof CachedIdentityAuthorizeCallback) {
                     CachedIdentityAuthorizeCallback ciac = (CachedIdentityAuthorizeCallback) callback;

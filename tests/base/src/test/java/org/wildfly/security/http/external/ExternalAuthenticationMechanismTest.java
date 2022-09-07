@@ -58,22 +58,22 @@ public class ExternalAuthenticationMechanismTest extends AbstractBaseHttpTest {
 
     @Test
     public void testExternalAuthenticationMechanism() throws Exception {
-        HttpServerAuthenticationMechanism mechanism = externalFactory.createAuthenticationMechanism(EXTERNAL_NAME, Collections.emptyMap(), getCallbackHandler("remoteUser", "testrealm@host.com", null));
+        HttpServerAuthenticationMechanism mechanism = externalFactory.createAuthenticationMechanism(EXTERNAL_NAME, Collections.emptyMap(), getCallbackHandler("remoteUser", "testrealm@host.com", null, null));
 
         //Test no authentication in progress (no remote user passed in externally)
-        TestingHttpServerRequest request1 = new TestingHttpServerRequest(null);
+        TestingHttpServerRequest request1 = new TestingHttpServerRequest(null, null);
         mechanism.evaluateRequest(request1);
         Assert.assertEquals(Status.NO_AUTH, request1.getResult());
 
         //Test unsuccessful authentication
-        TestingHttpServerRequest request2 = new TestingHttpServerRequest(null);
+        TestingHttpServerRequest request2 = new TestingHttpServerRequest(null, null);
         request2.setRemoteUser("wrongUser");
         mechanism.evaluateRequest(request2);
         Assert.assertEquals(Status.FAILED, request2.getResult());
         Assert.assertEquals(FORBIDDEN, request2.getResponse().getStatusCode());
 
         //Test successful authentication
-        TestingHttpServerRequest request3 = new TestingHttpServerRequest(null);
+        TestingHttpServerRequest request3 = new TestingHttpServerRequest(null, null);
         request3.setRemoteUser("remoteUser");
         mechanism.evaluateRequest(request3);
         Assert.assertEquals(Status.COMPLETE, request3.getResult());
@@ -82,19 +82,12 @@ public class ExternalAuthenticationMechanismTest extends AbstractBaseHttpTest {
 
     @Test
     public void testBearerAuthenticationMechanism() throws Exception {
-        HttpServerAuthenticationMechanism mechanism = bearerFactory.createAuthenticationMechanism(BEARER_TOKEN, Collections.emptyMap(), getCallbackHandler("remoteUser", "testrealm@host.com", null));
+        HttpServerAuthenticationMechanism mechanism = bearerFactory.createAuthenticationMechanism(BEARER_TOKEN, Collections.emptyMap(), getCallbackHandler("remoteUser", "testrealm@host.com", null, "random"));
 
         //Test no authentication in progress (no remote user passed in externally)
-        TestingHttpServerRequest request1 = new TestingHttpServerRequest(new String[] {"Bearer random"});
+        TestingHttpServerRequest request1 = new TestingHttpServerRequest(null);
         mechanism.evaluateRequest(request1);
         Assert.assertEquals(Status.NO_AUTH, request1.getResult());
-
-        //Test unsuccessful authentication
-        TestingHttpServerRequest request2 = new TestingHttpServerRequest(new String[] {"Bearer random"});
-        request2.setRemoteUser("wrongUser");
-        mechanism.evaluateRequest(request2);
-        Assert.assertEquals(Status.FAILED, request2.getResult());
-        Assert.assertEquals(FORBIDDEN, request2.getResponse().getStatusCode());
 
         //Test successful authentication
         TestingHttpServerRequest request3 = new TestingHttpServerRequest(new String[] {"Bearer random"});
