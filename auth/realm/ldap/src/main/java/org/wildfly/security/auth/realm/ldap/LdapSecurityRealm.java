@@ -1243,27 +1243,40 @@ class LdapSecurityRealm implements ModifiableSecurityRealm, CacheableSecurityRea
 
         @Override
         public void objectAdded(NamingEvent evt) {
-
+            // ignore, don't log as this could spam
         }
 
         @Override
         public void objectRemoved(NamingEvent evt) {
+            if (log.isTraceEnabled()) {
+                log.tracef("Object with name [%s] was removed", evt.getOldBinding().getName());
+            }
             invokeCacheUpdateListener(evt);
         }
 
         @Override
         public void objectRenamed(NamingEvent evt) {
+            if (log.isTraceEnabled()) {
+                log.tracef("Object with old name [%s] was renamed", evt.getOldBinding().getName());
+            }
             invokeCacheUpdateListener(evt);
         }
 
         @Override
         public void objectChanged(NamingEvent evt) {
+            if (log.isTraceEnabled()) {
+                log.tracef("Object with old name [%s] has changed", evt.getOldBinding().getName());
+            }
             invokeCacheUpdateListener(evt);
         }
 
         @Override
         public void namingExceptionThrown(NamingExceptionEvent evt) {
-
+            if (log.isTraceEnabled()) {
+                log.tracef("namingExceptionThrown thrown: [%s], with explanation: [%s] and cause: [%s]. " +
+                                "Maybe persistent search not recognized by the LDAP server?",
+                        evt.getException().toString(), evt.getException().getExplanation(), evt.getException().getCause());
+            }
         }
 
         private void invokeCacheUpdateListener(NamingEvent evt) {
