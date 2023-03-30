@@ -23,6 +23,7 @@ import static org.wildfly.security.auth.realm.ElytronMessages.log;
 
 import java.security.Principal;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Objects;
 
 import org.wildfly.security.auth.SupportLevel;
 import org.wildfly.security.auth.server.IdentityCredentials;
@@ -212,7 +213,22 @@ public class CachingSecurityRealm implements SecurityRealm {
                 if (evidence instanceof PasswordGuessEvidence) {
                     if (credentials.canVerify(evidence)) {
                         log.tracef("verifyEvidence For principal='%s' using cached credential", principal);
-                        return credentials.verify(evidence);
+                        boolean credentialsVerified = credentials.verify(evidence);
+                        if (!credentialsVerified) {
+                            log.tracef("verifyEvidence For principal='%s' using cached credential failed", principal);
+                        }
+                        // if system property set and verification failed then verify evidence directly on an identity
+                        if (Objects.equals(System.getProperty("cached.realm.repeat.on.failed.auth"), "true") && !credentialsVerified) {
+                            char[] guess = ((PasswordGuessEvidence) evidence).getGuess();
+                            Password password = ClearPassword.createRaw(ClearPassword.ALGORITHM_CLEAR, guess);
+                            log.tracef("verifyEvidence Falling back to direct support of identity for principal='%s'", principal);
+                            if (identity.verifyEvidence(evidence)) {
+                                credentials =  credentials.without(PasswordCredential.class);
+                                credentials = credentials.withCredential(new PasswordCredential(password));
+                                return true;
+                            }
+                        }
+                        return credentialsVerified;
                     }
                     Credential credential = identity.getCredential(PasswordCredential.class);
                     if (credential != null) {
