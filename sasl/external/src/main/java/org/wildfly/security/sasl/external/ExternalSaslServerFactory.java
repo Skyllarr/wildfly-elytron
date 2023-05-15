@@ -41,7 +41,7 @@ import org.wildfly.security.sasl.util.SaslMechanismInformation;
 public final class ExternalSaslServerFactory implements SaslServerFactory {
 
     public SaslServer createSaslServer(final String mechanism, final String protocol, final String serverName, final Map<String, ?> props, final CallbackHandler cbh) throws SaslException {
-        return mechanism.equals(SaslMechanismInformation.Names.EXTERNAL) && getMechanismNames(props, false).length != 0 ? new ExternalSaslServer(cbh) : null;
+        return mechanism.equals(SaslMechanismInformation.Names.EXTERNAL) && getMechanismNames(props, false).length != 0 ? new ExternalSaslServer(cbh, Boolean.getBoolean(props.get("org.wildfly.security.http.skip-certificate-verification").toString())) : null;
     }
 
     private String[] getMechanismNames(final Map<String, ?> props, boolean query) {

@@ -23,6 +23,7 @@ import static org.wildfly.security.mechanism._private.ElytronMessages.saslExtern
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
+import java.util.HashMap;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -42,8 +43,15 @@ final class ExternalSaslServer implements SaslServer {
     private boolean complete;
     private String authorizationID;
 
+    private boolean skip;
+
     ExternalSaslServer(final CallbackHandler cbh) {
         this.cbh = cbh;
+    }
+
+    ExternalSaslServer(final CallbackHandler cbh, boolean skipCertVerification) {
+        this.cbh = cbh;
+        this.skip = skipCertVerification;
     }
 
     public String getMechanismName() {

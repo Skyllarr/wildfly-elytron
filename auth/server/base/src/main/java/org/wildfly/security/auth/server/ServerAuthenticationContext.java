@@ -893,11 +893,26 @@ public final class ServerAuthenticationContext implements AutoCloseable {
                         if (stateRef.get().canVerifyEvidence()) {
                             if (peerCerts != null) {
                                 log.tracef("Authentication ID is null but SSL peer certificates are available. Trying to authenticate peer");
-                                verifyEvidence(new X509PeerCertificateChainEvidence(peerCerts));
+                                String mechanismName = stateRef.get().getMechanismInformation().getMechanismName();
+                                String mechanismType = stateRef.get().getMechanismInformation().getMechanismType();
+                                // if SASL external and skip=true then do not verifyEvidence with the configured security realm
+                                if ((mechanismType.equals("SASL") && mechanismName.equals("EXTERNAL") && System.getProperty("skip").equals("true"))) {
+                                    X509PeerCertificateChainEvidence evidence = new X509PeerCertificateChainEvidence(peerCerts);
+                                    setDecodedEvidencePrincipal(evidence);
+//                                    authorize(evidence.getDecodedPrincipal());
+//                                    PrincipalAuthorizeCallback principalCallback = new PrincipalAuthorizeCallback(evidence.getDecodedPrincipal());
+                                    stateRef.get().setPrincipal(evidence.getDecodedPrincipal(), false );
+//                                    ((AuthorizeCallback) callback).setAuthorized(principalCallback.isAuthorized());
+//                                    authorizationID = evidence.getDecodedPrincipal().getName();
+                                }
+                                else {
+                                    verifyEvidence(new X509PeerCertificateChainEvidence(peerCerts));
+                                }
                             }
                         }
                     }
                     String authorizationID = authorizeCallback.getAuthorizationID();
+                    // the authorize() method returns true for SASL EXTERNAL with SKIP property the same way as it does for HTTP with skip=true
                     boolean authorized = authorizationID != null ? authorize(authorizationID) : authorize();
                     log.tracef("Handling AuthorizeCallback: authenticationID = %s  authorizationID = %s  authorized = %b", authenticationID, authorizationID, authorized);
                     authorizeCallback.setAuthorized(authorized);
@@ -1236,6 +1251,10 @@ public final class ServerAuthenticationContext implements AutoCloseable {
             throw log.noAuthenticationInProgress();
         }
 
+        MechanismInformation getMechanismInformation() {
+            throw log.noAuthenticationInProgress();
+        }
+
         SecurityIdentity getAuthorizedIdentity() {
             throw log.noAuthenticationInProgress();
         }
@@ -1389,6 +1408,11 @@ public final class ServerAuthenticationContext implements AutoCloseable {
         }
 
         @Override
+        MechanismInformation getMechanismInformation() {
+            return mechanismInformation;
+        }
+
+        @Override
         SecurityDomain getSecurityDomain() {
             return capturedIdentity.getSecurityDomain();
         }
@@ -1494,7 +1518,7 @@ public final class ServerAuthenticationContext implements AutoCloseable {
                         mechanismInformation.getMechanismName(), mechanismInformation.getHostName(),
                         mechanismInformation.getProtocol());
             }
-            return new InitialState(capturedIdentity, mechanismConfiguration, mechanismConfigurationSelector, privateCredentials, publicCredentials, runtimeAttributes);
+            return new InitialState(capturedIdentity, mechanismConfiguration, mechanismConfigurationSelector, privateCredentials, publicCredentials, runtimeAttributes, mechanismInformation);
         }
 
     }
@@ -1774,6 +1798,11 @@ public final class ServerAuthenticationContext implements AutoCloseable {
             return mechanismConfiguration;
         }
 
+        @Override
+        MechanismInformation getMechanismInformation() {
+            return getMechanismInformation();
+        }
+
         IdentityCredentials getPrivateCredentials() {
             return privateCredentials;
         }
@@ -1790,10 +1819,12 @@ public final class ServerAuthenticationContext implements AutoCloseable {
     final class InitialState extends UnassignedState {
 
         private final MechanismConfigurationSelector mechanismConfigurationSelector;
+        private final MechanismInformation mechanismInformation;
 
-        InitialState(final SecurityIdentity capturedIdentity, final MechanismConfiguration mechanismConfiguration, final MechanismConfigurationSelector mechanismConfigurationSelector, final IdentityCredentials privateCredentials, final IdentityCredentials publicCredentials, final Attributes runtimeAttributes) {
+        InitialState(final SecurityIdentity capturedIdentity, final MechanismConfiguration mechanismConfiguration, final MechanismConfigurationSelector mechanismConfigurationSelector, final IdentityCredentials privateCredentials, final IdentityCredentials publicCredentials, final Attributes runtimeAttributes, final MechanismInformation mechanismInformation) {
             super(capturedIdentity, mechanismConfiguration, privateCredentials, publicCredentials, runtimeAttributes);
             this.mechanismConfigurationSelector = mechanismConfigurationSelector;
+            this.mechanismInformation = mechanismInformation;
         }
 
         @Override
@@ -1826,6 +1857,11 @@ public final class ServerAuthenticationContext implements AutoCloseable {
         }
 
         @Override
+        MechanismInformation getMechanismInformation() {
+            return this.mechanismInformation;
+        }
+
+        @Override
         void setMechanismInformation(MechanismInformation mechanismInformation) {
             InactiveState inactiveState = new InactiveState(capturedIdentity, mechanismConfigurationSelector, mechanismInformation, privateCredentials, publicCredentials, runtimeAttributes);
             InitialState newState = inactiveState.selectMechanismConfiguration();
@@ -1835,7 +1871,7 @@ public final class ServerAuthenticationContext implements AutoCloseable {
         }
 
         void addPublicCredential(final Credential credential) {
-            final InitialState newState = new InitialState(getSourceIdentity(), getMechanismConfiguration(), mechanismConfigurationSelector, getPrivateCredentials(), getPublicCredentials().withCredential(credential), runtimeAttributes);
+            final InitialState newState = new InitialState(getSourceIdentity(), getMechanismConfiguration(), mechanismConfigurationSelector, getPrivateCredentials(), getPublicCredentials().withCredential(credential), runtimeAttributes, null);
             if (! stateRef.compareAndSet(this, newState)) {
                 stateRef.get().addPublicCredential(credential);
             }
@@ -1843,14 +1879,14 @@ public final class ServerAuthenticationContext implements AutoCloseable {
 
         @Override
         void addPrivateCredential(final Credential credential) {
-            final InitialState newState = new InitialState(getSourceIdentity(), getMechanismConfiguration(), mechanismConfigurationSelector, getPrivateCredentials().withCredential(credential), getPublicCredentials(), runtimeAttributes);
+            final InitialState newState = new InitialState(getSourceIdentity(), getMechanismConfiguration(), mechanismConfigurationSelector, getPrivateCredentials().withCredential(credential), getPublicCredentials(), runtimeAttributes, null);
             if (! stateRef.compareAndSet(this, newState)) {
                 stateRef.get().addPublicCredential(credential);
             }
         }
 
         void addRuntimeAttributes(final Attributes runtimeAttributes) {
-            final InitialState newState = new InitialState(getSourceIdentity(), getMechanismConfiguration(), mechanismConfigurationSelector, getPrivateCredentials(), getPublicCredentials(), AggregateAttributes.aggregateOf(getRuntimeAttributes(), runtimeAttributes));
+            final InitialState newState = new InitialState(getSourceIdentity(), getMechanismConfiguration(), mechanismConfigurationSelector, getPrivateCredentials(), getPublicCredentials(), AggregateAttributes.aggregateOf(getRuntimeAttributes(), runtimeAttributes), null);
             if (! stateRef.compareAndSet(this, newState)) {
                 stateRef.get().addRuntimeAttributes(runtimeAttributes);
             }
