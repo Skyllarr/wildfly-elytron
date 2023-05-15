@@ -102,6 +102,21 @@
             <artifactId>jmockit</artifactId>
             <scope>test</scope>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.wildfly.security</groupId>-->
+<!--            <artifactId>wildfly-elytron-realm</artifactId>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.wildfly.security</groupId>-->
+<!--            <artifactId>wildfly-elytron-auth-server-sasl</artifactId>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.wildfly.security</groupId>-->
+<!--            <artifactId>wildfly-elytron-sasl-external</artifactId>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
     </dependencies>
 
 </project>

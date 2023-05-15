@@ -70,6 +70,11 @@ public final class SetMechanismInformationSaslServerFactory extends AbstractDele
                 public String getHostName() {
                     return serverName;
                 }
+
+                @Override
+                public Map<String, ?> getProperties() {
+                    return props;
+                }
             });
             cbh.handle(new Callback[] { mechanismInformationCallback });
         } catch (Throwable e) {

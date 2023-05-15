@@ -110,6 +110,11 @@ public class SetMechanismInformationMechanismFactory implements HttpServerAuthen
                         public String getHostName() {
                             return hostName;
                         }
+
+                        @Override
+                        public Map<String, ?> getProperties() {
+                            return properties;
+                        }
                     })});
 
                 } catch (Throwable e) {

@@ -17,6 +17,8 @@
  */
 package org.wildfly.security.auth.server;
 
+import java.util.Map;
+
 /**
  * Information about the current mechanism being used for authentication.
  *
@@ -52,6 +54,10 @@ public interface MechanismInformation {
      * @return the protocol for the current authentication attempt.
      */
     String getProtocol();
+
+    default Map<String, ?> getProperties(){
+        return null;
+    }
 
     MechanismInformation DEFAULT = new MechanismInformation() {
 
