@@ -20,6 +20,7 @@ package org.wildfly.security.http.util;
 import static org.wildfly.security.http.HttpConstants.HOST;
 import static org.wildfly.security.http.util.ElytronMessages.log;
 
+import java.net.URI;
 import java.util.Map;
 
 import javax.security.auth.callback.Callback;
@@ -73,6 +74,7 @@ public class SetMechanismInformationMechanismFactory implements HttpServerAuthen
             public void evaluateRequest(HttpServerRequest request) throws HttpAuthenticationException {
                 String host = request.getFirstRequestHeaderValue(HOST);
                 String resolvedHostName = null;
+                URI requestedUri = request.getRequestURI();
                 if (host != null) {
                   if (host.startsWith("[")) {
                       int close = host.indexOf(']');
@@ -110,6 +112,11 @@ public class SetMechanismInformationMechanismFactory implements HttpServerAuthen
                         public String getHostName() {
                             return hostName;
                         }
+                        @Override
+                        public String getRequestURI() {
+                            return requestedUri.toString();
+                        }
+
                     })});
 
                 } catch (Throwable e) {

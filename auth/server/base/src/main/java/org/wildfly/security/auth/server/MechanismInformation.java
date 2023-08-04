@@ -53,6 +53,10 @@ public interface MechanismInformation {
      */
     String getProtocol();
 
+    default String getRequestURI() {
+        return null;
+    }
+
     MechanismInformation DEFAULT = new MechanismInformation() {
 
         @Override

@@ -1097,6 +1097,9 @@ public final class ServerAuthenticationContext implements AutoCloseable {
                                     mi.getMechanismType(), mi.getMechanismName(), mi.getHostName(), mi.getProtocol());
                         }
                         setMechanismInformation(mi);
+                        Attributes runtimeAttributes = new MapAttributes();
+                        runtimeAttributes.addFirst("Request-URI", mi.getRequestURI());
+                        addRuntimeAttributes(runtimeAttributes);
                         handleOne(callbacks, idx + 1);
                     } catch (Exception e) {
                         throw new IOException(e);
@@ -2091,13 +2094,55 @@ public final class ServerAuthenticationContext implements AutoCloseable {
         void fail(final boolean requireInProgress) {
             final SecurityIdentity capturedIdentity = getSourceIdentity();
             final AtomicReference<State> stateRef = getStateRef();
-            if (! stateRef.compareAndSet(this, FAILED)) {
+            if (!stateRef.compareAndSet(this, FAILED)) {
                 stateRef.get().fail(requireInProgress);
                 return;
             }
-            SecurityRealm.safeHandleRealmEvent(getRealmInfo().getSecurityRealm(), new RealmFailedAuthenticationEvent(realmIdentity, null, null));
+            SecurityRealm.safeHandleRealmEvent(getRealmInfo().getSecurityRealm(), new RealmFailedAuthenticationEvent(getRealmIdentityWithRuntimeAttributes(), null, null));
             SecurityDomain.safeHandleSecurityEvent(capturedIdentity.getSecurityDomain(), new SecurityAuthenticationFailedEvent(capturedIdentity, realmIdentity.getRealmIdentityPrincipal()));
             realmIdentity.dispose();
+        }
+
+        private RealmIdentity getRealmIdentityWithRuntimeAttributes() {
+            return new RealmIdentity() {
+                @Override
+                public Principal getRealmIdentityPrincipal() {
+                    return realmIdentity.getRealmIdentityPrincipal();
+                }
+
+                @Override
+                public SupportLevel getCredentialAcquireSupport(Class<? extends Credential> credentialType, String algorithmName, AlgorithmParameterSpec parameterSpec) throws RealmUnavailableException {
+                    return realmIdentity.getCredentialAcquireSupport(credentialType, algorithmName, parameterSpec);
+                }
+
+                @Override
+                public <C extends Credential> C getCredential(Class<C> credentialType) throws RealmUnavailableException {
+                    return realmIdentity.getCredential(credentialType);
+                }
+
+                @Override
+                public SupportLevel getEvidenceVerifySupport(Class<? extends Evidence> evidenceType, String algorithmName) throws RealmUnavailableException {
+                    return realmIdentity.getEvidenceVerifySupport(evidenceType, algorithmName);
+                }
+
+                @Override
+                public boolean verifyEvidence(Evidence evidence) throws RealmUnavailableException {
+                    return realmIdentity.verifyEvidence(evidence);
+                }
+
+                @Override
+                public boolean exists() throws RealmUnavailableException {
+                    return realmIdentity.exists();
+                }
+
+                public AuthorizationIdentity getAuthorizationIdentity() throws RealmUnavailableException {
+                    if (realmIdentity.exists()) {
+                        return AuthorizationIdentity.basicIdentity(realmIdentity.getAuthorizationIdentity(), runtimeAttributes);
+                    } else {
+                        return AuthorizationIdentity.basicIdentity(AuthorizationIdentity.EMPTY, runtimeAttributes);
+                    }
+                }
+            };
         }
 
         @Override
