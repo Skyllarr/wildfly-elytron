@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2023 Red Hat, Inc., and individual contributors
+ * Copyright 2016 Red Hat, Inc., and individual contributors
  * as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wildfly.security.http.digest;
 
-import java.io.Serializable;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,24 +27,71 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.wildfly.security.http.HttpServerRequest;
-import org.wildfly.security.mechanism.AuthenticationMechanismException;
 import org.wildfly.security.mechanism._private.ElytronMessages;
+import org.wildfly.security.mechanism.AuthenticationMechanismException;
+
+import static org.wildfly.security.http.HttpConstants.SHA256;
 
 /**
- * A utility responsible for managing nonces that is stored in an HTTP session.
+ * A utility responsible for managing nonces.
+ *
+ * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
-class PersistentNonceManager implements NonceManager, Serializable {
+class DefaultNonceManager implements NonceManager {
 
-    private transient ScheduledExecutorService executor;
-    private AtomicInteger nonceCounter = new AtomicInteger();
-    private Map<String, NonceManagerUtils.NonceState> usedNonces = new HashMap<>();
-    private byte[] privateKey;
-    private long validityPeriodNano;
-    private long nonceSessionTime;
-    private boolean singleUse;
-    private String algorithm;
+    private final ScheduledExecutorService executor;
+    private final AtomicInteger nonceCounter = new AtomicInteger();
+    private final Map<String, NonceManagerUtils.NonceState> usedNonces = new HashMap<>();
+
+    private final byte[] privateKey;
+
+    private final long validityPeriodNano;
+    private final long nonceSessionTime;
+    private final boolean singleUse;
+    private final String algorithm;
     private ElytronMessages log;
     private transient HttpServerRequest request;
+
+    /**
+     * initialize with default values
+     */
+    DefaultNonceManager() {
+        this.validityPeriodNano = NonceManagerUtils.DEFAULT_VALIDITY_PERIOD * 1000000;
+        nonceSessionTime = NonceManagerUtils.DEFAULT_NONCE_SESSION_TIME;
+        singleUse = true;
+        this.privateKey = new byte[NonceManagerUtils.DEFAULT_KEY_SIZE];
+        new SecureRandom().nextBytes(privateKey);
+        algorithm = SHA256;
+        log = ElytronMessages.httpDigest;
+        ScheduledThreadPoolExecutor INSTANCE = new ScheduledThreadPoolExecutor(1);
+        INSTANCE.setRemoveOnCancelPolicy(true);
+        INSTANCE.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        executor = INSTANCE;
+    }
+
+    /**
+     * @param validityPeriod the time in ms that nonces are valid for in ms.
+     * @param nonceSessionTime the time in ms a nonce is usable for after it's last use where nonce counts are in use.
+     * @param singleUse are nonces single use?
+     * @param keySize the number of bytes to use in the private key of this node.
+     * @param algorithm the message digest algorithm to use when creating the digest portion of the nonce.
+     */
+
+    @Deprecated
+    DefaultNonceManager(long validityPeriod, long nonceSessionTime, boolean singleUse, int keySize, String algorithm) {
+        this.validityPeriodNano = validityPeriod * 1000000;
+        this.nonceSessionTime = nonceSessionTime;
+        this.singleUse = singleUse;
+        this.algorithm = algorithm;
+        this.log = ElytronMessages.log;
+
+        this.privateKey = new byte[keySize];
+        new SecureRandom().nextBytes(privateKey);
+        ScheduledThreadPoolExecutor INSTANCE = new ScheduledThreadPoolExecutor(1);
+        INSTANCE.setRemoveOnCancelPolicy(true);
+        INSTANCE.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        executor = INSTANCE;
+    }
 
     /**
      * @param validityPeriod the time in ms that nonces are valid for in ms.
@@ -54,8 +101,20 @@ class PersistentNonceManager implements NonceManager, Serializable {
      * @param algorithm the message digest algorithm to use when creating the digest portion of the nonce.
      * @param log mechanism specific logger.
      */
-    PersistentNonceManager(long validityPeriod, long nonceSessionTime, boolean singleUse, int keySize, String algorithm, ElytronMessages log) {
-        this(validityPeriod, nonceSessionTime, singleUse, keySize, algorithm, log, null);
+    DefaultNonceManager(long validityPeriod, long nonceSessionTime, boolean singleUse, int keySize, String algorithm, ElytronMessages log) {
+        this.validityPeriodNano = validityPeriod * 1000000;
+        this.nonceSessionTime = nonceSessionTime;
+        this.singleUse = singleUse;
+        this.algorithm = algorithm;
+        this.log = log;
+        NonceManagerUtils.setLogger(log);
+
+        this.privateKey = new byte[keySize];
+        new SecureRandom().nextBytes(privateKey);
+        ScheduledThreadPoolExecutor INSTANCE = new ScheduledThreadPoolExecutor(1);
+        INSTANCE.setRemoveOnCancelPolicy(true);
+        INSTANCE.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        executor = INSTANCE;
     }
 
     /**
@@ -67,22 +126,32 @@ class PersistentNonceManager implements NonceManager, Serializable {
      * @param log mechanism specific logger.
      * @param customExecutor a custom ScheduledExecutorService to be used
      */
-    PersistentNonceManager(long validityPeriod, long nonceSessionTime, boolean singleUse, int keySize, String algorithm, ElytronMessages log, ScheduledExecutorService customExecutor) {
+    DefaultNonceManager(long validityPeriod, long nonceSessionTime, boolean singleUse, int keySize, String algorithm, ElytronMessages log, ScheduledExecutorService customExecutor) {
         this.validityPeriodNano = validityPeriod * 1000000;
         this.nonceSessionTime = nonceSessionTime;
         this.singleUse = singleUse;
         this.algorithm = algorithm;
         this.log = log;
+        NonceManagerUtils.setLogger(log);
+
         this.privateKey = new byte[keySize];
         new SecureRandom().nextBytes(privateKey);
         if (customExecutor == null) {
-            setDefaultExecutor();
+            ScheduledThreadPoolExecutor INSTANCE = new ScheduledThreadPoolExecutor(1);
+            INSTANCE.setRemoveOnCancelPolicy(true);
+            INSTANCE.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+            executor = INSTANCE;
         }
         else {
             executor = customExecutor;
         }
     }
 
+    /**
+     * Generate a new encoded nonce to send to the client.
+     *
+     * @return a new encoded nonce to send to the client.
+     */
     public String generateNonce() {
         return generateNonce(null);
     }
@@ -94,7 +163,7 @@ class PersistentNonceManager implements NonceManager, Serializable {
      * @return a new encoded nonce to send to the client.
      */
     public String generateNonce(byte[] salt) {
-        return NonceManagerUtils.generateNonce(salt, algorithm, nonceCounter, privateKey );
+        return NonceManagerUtils.generateNonce(salt, algorithm, nonceCounter, privateKey);
     }
 
     /**
@@ -145,18 +214,7 @@ class PersistentNonceManager implements NonceManager, Serializable {
         return this.request;
     }
 
-    ScheduledExecutorService getExecutor() {
-        return executor;
-    }
-
-    void setDefaultExecutor() {
-        ScheduledThreadPoolExecutor INSTANCE = new ScheduledThreadPoolExecutor(1);
-        INSTANCE.setRemoveOnCancelPolicy(true);
-        INSTANCE.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
-        this.executor = INSTANCE;
-    }
-
     public void shutdown() {
-        NonceManagerUtils.shutdown(this.executor);
+        if (executor != null) { executor.shutdown(); }
     }
 }

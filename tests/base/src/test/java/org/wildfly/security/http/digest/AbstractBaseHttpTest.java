@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.wildfly.security.http.impl;
+package org.wildfly.security.http.digest;
 
 import static org.wildfly.security.auth.server.ServerUtils.ELYTRON_PASSWORD_PROVIDERS;
 import static org.wildfly.security.http.HttpConstants.AUTHENTICATION_INFO;
@@ -81,9 +81,6 @@ import org.wildfly.security.http.Scope;
 import org.wildfly.security.http.basic.BasicMechanismFactory;
 import org.wildfly.security.http.bearer.BearerMechanismFactory;
 import org.wildfly.security.http.cert.ClientCertMechanismFactory;
-import org.wildfly.security.http.digest.DigestMechanismFactory;
-import org.wildfly.security.http.digest.NonceManager;
-import org.wildfly.security.http.digest.PersistentNonceManager;
 import org.wildfly.security.http.external.ExternalMechanismFactory;
 import org.wildfly.security.password.Password;
 import org.wildfly.security.password.PasswordFactory;
@@ -108,7 +105,7 @@ public class AbstractBaseHttpTest {
     protected HttpServerAuthenticationMechanismFactory statefulBasicFactory = new org.wildfly.security.http.sfbasic.BasicMechanismFactory(ELYTRON_PASSWORD_PROVIDERS.get());
 
     protected void mockDigestNonce(final String nonce) {
-        new MockUp<NonceManager>() {
+        new MockUp<DefaultNonceManager>() {
             @Mock
             String generateNonce(byte[] salt) {
                 return nonce;

@@ -74,7 +74,7 @@ public class DigestMechanismFactory implements HttpServerAuthenticationMechanism
      * SHA256 Digest Algorithm
      */
 
-    private static NonceManager nonceManager = new NonceManager(300000, 900000, true, 20, SHA256, ElytronMessages.httpDigest);
+    private static NonceManager nonceManager = new DefaultNonceManager(300000, 900000, true, 20, SHA256, ElytronMessages.httpDigest);
 
     /**
      * @see org.wildfly.security.http.HttpServerAuthenticationMechanismFactory#getMechanismNames(java.util.Map)
@@ -99,7 +99,6 @@ public class DigestMechanismFactory implements HttpServerAuthenticationMechanism
         checkNotNullParam("properties", properties);
         checkNotNullParam("callbackHandler", callbackHandler);
 
-        // TODO can I properties this with the PersistentNonceManager
         if (properties.containsKey("nonceManager")) {
             nonceManager = (NonceManager) properties.get("nonceManager");
         } else if (properties.get(CONFIG_SESSION_BASED_DIGEST_NONCE_MANAGER) != null) {

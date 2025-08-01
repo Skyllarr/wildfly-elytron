@@ -21,7 +21,7 @@ package org.wildfly.security.http.bearer;
 import org.junit.Assert;
 import org.junit.Test;
 import org.wildfly.security.http.HttpServerAuthenticationMechanism;
-import org.wildfly.security.http.impl.AbstractBaseHttpTest;
+import org.wildfly.security.http.digest.AbstractBaseHttpTest;
 
 import static org.wildfly.security.http.HttpConstants.BEARER_TOKEN;
 import static org.wildfly.security.http.HttpConstants.UNAUTHORIZED;

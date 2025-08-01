@@ -33,7 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.wildfly.security.http.HttpServerAuthenticationMechanism;
-import org.wildfly.security.http.impl.AbstractBaseHttpTest;
+import org.wildfly.security.http.digest.AbstractBaseHttpTest;
 
 /**
  * Test of server side of the External HTTP mechanism.

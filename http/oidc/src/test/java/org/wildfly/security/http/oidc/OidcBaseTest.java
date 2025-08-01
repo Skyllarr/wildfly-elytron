@@ -57,7 +57,7 @@ import org.wildfly.security.http.HttpScope;
 import org.wildfly.security.http.HttpServerAuthenticationMechanism;
 import org.wildfly.security.http.HttpServerAuthenticationMechanismFactory;
 import org.wildfly.security.http.HttpServerCookie;
-import org.wildfly.security.http.impl.AbstractBaseHttpTest;
+import org.wildfly.security.http.digest.AbstractBaseHttpTest;
 import org.wildfly.security.jose.util.JsonSerialization;
 
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;

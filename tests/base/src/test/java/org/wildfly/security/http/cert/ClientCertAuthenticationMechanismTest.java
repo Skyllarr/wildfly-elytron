@@ -28,7 +28,7 @@ import org.wildfly.security.auth.server.SecurityDomain;
 import org.wildfly.security.cache.IdentityCache;
 import org.wildfly.security.http.HttpAuthenticationException;
 import org.wildfly.security.http.HttpServerAuthenticationMechanism;
-import org.wildfly.security.http.impl.AbstractBaseHttpTest;
+import org.wildfly.security.http.digest.AbstractBaseHttpTest;
 
 import javax.security.auth.x500.X500Principal;
 import java.security.Provider;

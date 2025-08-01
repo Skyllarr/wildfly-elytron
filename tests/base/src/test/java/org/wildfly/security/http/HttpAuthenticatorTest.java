@@ -39,7 +39,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.wildfly.security.http.digest.WildFlyElytronHttpDigestProvider;
-import org.wildfly.security.http.impl.AbstractBaseHttpTest;
+import org.wildfly.security.http.digest.AbstractBaseHttpTest;
 import org.wildfly.security.http.util.SecurityProviderServerMechanismFactory;
 
 import mockit.integration.junit4.JMockit;

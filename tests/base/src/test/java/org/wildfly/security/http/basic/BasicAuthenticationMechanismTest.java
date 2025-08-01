@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import org.wildfly.security.http.HttpConstants;
 import org.wildfly.security.http.HttpServerAuthenticationMechanism;
 import org.wildfly.security.http.HttpServerCookie;
-import org.wildfly.security.http.impl.AbstractBaseHttpTest;
+import org.wildfly.security.http.digest.AbstractBaseHttpTest;
 import org.wildfly.security.http.sfbasic.BasicMechanismFactory;
 
 /**

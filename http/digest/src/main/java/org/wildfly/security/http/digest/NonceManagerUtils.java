@@ -44,6 +44,7 @@ public class NonceManagerUtils {
     public static final int DEFAULT_KEY_SIZE = 20;
 
     private static final int PREFIX_LENGTH = Integer.BYTES + Long.BYTES;
+
     private static  ElytronMessages log = ElytronMessages.httpDigest;
     /**
      * Generate a new encoded nonce to send to the client.
@@ -220,7 +221,11 @@ public class NonceManagerUtils {
         }
     }
 
-    public void shutdown(ScheduledExecutorService executor) {
+    public static void setLogger(ElytronMessages log) {
+        NonceManagerUtils.log = log;
+    }
+
+    public static void shutdown(ScheduledExecutorService executor) {
         if (executor != null) { executor.shutdown(); }
     }
 

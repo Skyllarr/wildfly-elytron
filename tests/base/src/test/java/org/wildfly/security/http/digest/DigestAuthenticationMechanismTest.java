@@ -26,7 +26,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.wildfly.security.http.HttpServerAuthenticationMechanism;
-import org.wildfly.security.http.impl.AbstractBaseHttpTest;
 
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -305,7 +304,7 @@ public class DigestAuthenticationMechanismTest extends AbstractBaseHttpTest {
 
         Field f = DigestMechanismFactory.class.getDeclaredField("nonceManager");
         f.setAccessible(true);
-        Assert.assertTrue(f.get(NonceManager.class) instanceof PersistentNonceManager);
+        Assert.assertTrue(f.get(DefaultNonceManager.class) instanceof PersistentNonceManager);
     }
 
     @Test
@@ -320,7 +319,7 @@ public class DigestAuthenticationMechanismTest extends AbstractBaseHttpTest {
 
         Field f = DigestMechanismFactory.class.getDeclaredField("nonceManager");
         f.setAccessible(true);
-        Assert.assertTrue(f.get(NonceManager.class) instanceof PersistentNonceManager);
+        Assert.assertTrue(f.get(DefaultNonceManager.class) instanceof PersistentNonceManager);
 
         TestingHttpServerRequest request1 = new TestingHttpServerRequest(null);
         mechanism.evaluateRequest(request1);
