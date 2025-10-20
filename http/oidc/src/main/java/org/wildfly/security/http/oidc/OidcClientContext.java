@@ -94,10 +94,10 @@ public class OidcClientContext {
         } else {
             OidcClientConfigurationDelegate delegate = new OidcClientConfigurationDelegate(this.oidcClientConfig);
             if (oidcClientConfig.getAuthServerBaseUrl() != null) {
-                delegate.setAuthServerBaseUrl(getAuthServerBaseUrl(facade, this.oidcClientConfig.getAuthServerBaseUrl()));
+                delegate.setAuthServerBaseUrl(getBaseUrlOfIdentityProvider(facade, this.oidcClientConfig.getAuthServerBaseUrl()));
             }
             if (oidcClientConfig.getProviderUrl() != null) {
-                delegate.setProviderUrl(oidcClientConfig.getProviderUrl());
+                delegate.setProviderUrl(getBaseUrlOfIdentityProvider(facade, oidcClientConfig.getProviderUrl()));
             }
             return delegate;
         }
@@ -628,7 +628,7 @@ public class OidcClientContext {
 
     }
 
-    protected String getAuthServerBaseUrl(OidcHttpFacade facade, String base) {
+    protected String getBaseUrlOfIdentityProvider(OidcHttpFacade facade, String base) {
         try {
             URIBuilder builder = new URIBuilder(base);
             URI request = URI.create(facade.getRequest().getURI());

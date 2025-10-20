@@ -79,6 +79,7 @@ public class OidcHttpFacade {
     private SecurityIdentity securityIdentity;
     private boolean restored;
     private final Map<String, String> headers = new HashMap<>();
+    private OidcClientConfiguration oidcClientConfiguration;
 
     public OidcHttpFacade(HttpServerRequest request, OidcClientContext oidcClientContext, CallbackHandler handler) {
         this.request = request;
@@ -180,13 +181,17 @@ public class OidcHttpFacade {
     }
 
     OidcClientConfiguration getOidcClientConfiguration() {
-        return oidcClientContext.resolveDeployment(this);
+        if (this.oidcClientConfiguration == null) {
+            this.oidcClientConfiguration = oidcClientContext.resolveDeployment(this);
+        }
+        return oidcClientConfiguration;
     }
 
     private OidcTokenStore createTokenStore() {
-        OidcClientConfiguration deployment = getOidcClientConfiguration();
-
-        if (Oidc.TokenStore.SESSION.equals(deployment.getTokenStore())) {
+        if (this.oidcClientConfiguration == null) {
+            this.oidcClientConfiguration = getOidcClientConfiguration();
+        }
+        if (Oidc.TokenStore.SESSION.equals(oidcClientConfiguration.getTokenStore())) {
             return new OidcSessionTokenStore(this);
         } else {
             return new OidcCookieTokenStore(this);

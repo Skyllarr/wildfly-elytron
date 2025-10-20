@@ -307,7 +307,7 @@ public class OidcClientConfiguration {
     }
 
     public String getProviderUrl() {
-        if (providerUrl == null) {
+        if (providerUrl == null && this.authServerBaseUrl == null) {
             resolveUrls();
         }
         return providerUrl;
