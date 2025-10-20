@@ -108,6 +108,19 @@ public class MockOidcClientConfiguration extends OidcBaseTest {
         performAuthentication(getOidcConfigurationInputStreamWithRequestParameter(REQUEST_URI.getValue()), REQUEST_URI.getValue());
     }
 
+    @Test
+    public void testRelativeProviderUrlIsResolvedCorrectly() throws Exception {
+        OidcClientConfiguration oidcClientConfiguration = OidcClientConfigurationBuilder.build(getOidcConfigurationInputStreamWithRequestParameter(REQUEST_URI.getValue(), true));
+        assertEquals(OidcClientConfiguration.RelativeUrlsUsed.ALWAYS, oidcClientConfiguration.getRelativeUrls());
+        OidcClientContext oidcClientContext = new OidcClientContext(oidcClientConfiguration);
+        OidcClientConfiguration oidcClientConfigurationWithResolvedUrls = oidcClientContext.resolveUrls(oidcClientConfiguration,
+                // the request will contain "Host" header with value "localhost:1234"
+                new OidcHttpFacade(new TestingHttpServerRequest(null, new URI("http://localhost:1234/myTestApp")), oidcClientContext, null));
+        // relative URL is taken from HTTP "Host" header of incoming request
+        assertEquals("http://localhost:1234/realms/WildFly/", oidcClientConfigurationWithResolvedUrls.getProviderUrl());
+    }
+
+
     public void performAuthentication(InputStream oidcConfig, String requestFormat) throws Exception {
         Map<String, Object> props = new HashMap<>();
         OidcClientConfiguration oidcClientConfiguration = OidcClientConfigurationBuilder.build(oidcConfig);
@@ -150,7 +163,13 @@ public class MockOidcClientConfiguration extends OidcBaseTest {
     }
 
     private InputStream getOidcConfigurationInputStreamWithRequestParameter(String requestParameter){
-        String oidcConfig = "{\n" +
+        return getOidcConfigurationInputStreamWithRequestParameter(requestParameter, false);
+    }
+
+    private InputStream getOidcConfigurationInputStreamWithRequestParameter(String requestParameter, boolean relativeProviderUrl){
+        StringBuilder oidcConfigStringBuilder = new StringBuilder();
+
+        oidcConfigStringBuilder.append( "{\n" +
                 "    \"client-id\" : \"" + CLIENT_ID + "\",\n" +
                 "    \"provider-url\" : \"" + KEYCLOAK_CONTAINER.getAuthServerUrl() + "/realms/" + TEST_REALM + "/" + "\",\n" +
                 "    \"public-client\" : \"false\",\n" +
@@ -160,8 +179,13 @@ public class MockOidcClientConfiguration extends OidcBaseTest {
                 "    \"scope\" : \"profile email phone\",\n" +
                 "    \"credentials\" : {\n" +
                 "        \"secret\" : \"" + CLIENT_SECRET + "\"\n" +
-                "    }\n" +
-                "}";
-        return new ByteArrayInputStream(oidcConfig.getBytes(StandardCharsets.UTF_8));
+                "    },\n");
+        if (relativeProviderUrl) {
+            oidcConfigStringBuilder.append("    \"provider-url\" : \"" + "/realms/" + TEST_REALM + "/" + "\"\n");
+        } else {
+            oidcConfigStringBuilder.append("    \"provider-url\" : \"" + KEYCLOAK_CONTAINER.getAuthServerUrl() + "/realms/" + TEST_REALM + "/" + "\"\n");
+        }
+        oidcConfigStringBuilder.append("}");
+        return new ByteArrayInputStream(oidcConfigStringBuilder.toString().getBytes(StandardCharsets.UTF_8));
     }
 }
