@@ -25,6 +25,7 @@ import static org.wildfly.security.http.oidc.Oidc.TokenStore;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.utils.URIBuilder;
@@ -102,6 +103,28 @@ public class OidcClientContext {
         }
     }
 
+    public KeycloakUriBuilder uri(String uri, boolean template) throws IllegalArgumentException {
+        if (uri == null) throw new IllegalArgumentException("uri parameter is null");
+        Matcher opaque = opaqueUri.matcher(uri);
+        if (opaque.matches()) {
+            this.authority = null;
+            this.host = null;
+            this.port = -1;
+            this.userInfo = null;
+            this.query = null;
+            this.scheme = opaque.group(1);
+            this.ssp = opaque.group(2);
+            return this;
+        } else {
+            Matcher match = hierarchicalUri.matcher(uri);
+            if (match.matches()) {
+                ssp = null;
+                return parseHierarchicalUri(uri, match, template);
+            }
+        }
+        throw new IllegalArgumentException("Illegal uri template: " + uri);
+    }
+
     /**
      * This delegate is used to store temporary, per-request metadata like request resolved URLs.
      * Ever method is delegated except URL get methods and isConfigured()
@@ -116,6 +139,7 @@ public class OidcClientContext {
 
         public void setAuthServerBaseUrl(String authServerBaseUrl) {
             this.authServerBaseUrl = authServerBaseUrl;
+            KeycloakUriBuilder serverBuilder = KeycloakUriBuilder.fromUri(authServerBaseUrl);
             resolveUrls();
         }
 
