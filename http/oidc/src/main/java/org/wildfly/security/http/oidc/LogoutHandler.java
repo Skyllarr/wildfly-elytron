@@ -264,31 +264,50 @@ final class LogoutHandler {
     }
 
     private boolean isLogoutCallbackPath(OidcHttpFacade facade) {
-        String uriStr = facade.getRequest().getURI();
-        // logoutCallbackPath can be either an URL path component or an absolute path.
-        // Only the path components are to be compared.
-        String tmpLogoutCallbackPath = getLogoutCallbackPath(facade);
+        return matchesLogoutCallbackPath(facade.getRequest().getRelativePath(), getLogoutCallbackPath(facade));
+    }
 
-        try {
-            if (tmpLogoutCallbackPath != null) {
-                // check path as valid format
-                URL url = new URL(tmpLogoutCallbackPath);
-                if (facade.getRequest().getRelativePath().equals(tmpLogoutCallbackPath)) {
-                    return true;
-                }
-            }
-
-        } catch (MalformedURLException e) {
-            // no-op
+    /**
+     * Returns whether the incoming request path matches the configured logout callback path.
+     * The configured value may be a relative path (e.g. {@code /logout/callback}) or an absolute
+     * {@code http}/{@code https} URI; only its path component is compared to the request path.
+     */
+    static boolean matchesLogoutCallbackPath(String requestRelativePath, String configuredLogoutCallbackPath) {
+        String configuredPath = extractPathFromLogoutCallbackConfiguration(configuredLogoutCallbackPath);
+        String requestPath = toComparablePath(requestRelativePath);
+        if (configuredPath == null || requestPath == null) {
+            return false;
         }
+        return configuredPath.equals(requestPath);
+    }
 
-        return false;
+    static String extractPathFromLogoutCallbackConfiguration(String configuredLogoutCallbackPath) {
+        if (configuredLogoutCallbackPath == null || configuredLogoutCallbackPath.isEmpty()) {
+            return null;
+        }
+        String trimmed = configuredLogoutCallbackPath.trim();
+        try {
+            return toComparablePath(new URL(trimmed).getPath());
+        } catch (MalformedURLException e) {
+            if (OidcClientConfigurationBuilder.isValidRelativePath(trimmed)) {
+                return toComparablePath(trimmed);
+            }
+            log.warnf("Ignoring invalid logout-callback-path: %s", configuredLogoutCallbackPath);
+            return null;
+        }
+    }
+
+    private static String toComparablePath(String path) {
+        if (path == null || path.isEmpty()) {
+            return null;
+        }
+        return path.startsWith("/") ? path : "/" + path;
     }
 
     private boolean isRpInitiatedLogoutPath(OidcHttpFacade facade) {
         String path = facade.getRequest().getRelativePath();
         String logoutPath = getLogoutPath(facade);
-        if (logoutPath == null) {
+        if (path == null || logoutPath == null) {
             return false;
         }
         return path.endsWith(logoutPath);
