@@ -249,15 +249,17 @@ public class OidcClientConfigurationBuilder {
             return;
         }
 
-        requireLogoutAttribute(oidcJsonConfiguration.getLogoutPath(), LOGOUT_PATH);
         requireLogoutAttribute(oidcJsonConfiguration.getLogoutCallbackPath(), LOGOUT_CALLBACK_PATH);
 
-        String tmpLogoutPath = oidcJsonConfiguration.getLogoutPath().trim();
-        log.debugf("LOGOUT_PATH: " + tmpLogoutPath);
-        if (isValidRelativePath(tmpLogoutPath)) {
-            oidcClientConfiguration.setLogoutPath(tmpLogoutPath);
-        } else {
-            throw log.invalidLogoutPath(tmpLogoutPath, LOGOUT_PATH);
+        String logoutPath = oidcJsonConfiguration.getLogoutPath();
+        if (logoutPath != null && !logoutPath.trim().isEmpty()) {
+            String tmpLogoutPath = logoutPath.trim();
+            log.debugf("LOGOUT_PATH: " + tmpLogoutPath);
+            if (isValidRelativePath(tmpLogoutPath)) {
+                oidcClientConfiguration.setLogoutPath(tmpLogoutPath);
+            } else {
+                throw log.invalidLogoutPath(tmpLogoutPath, LOGOUT_PATH);
+            }
         }
 
         String tmpLogoutCallbackPath = oidcJsonConfiguration.getLogoutCallbackPath().trim();
